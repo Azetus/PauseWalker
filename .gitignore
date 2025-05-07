@@ -1,0 +1,15 @@
+.vs/
+**/.vs/
+
+.vscode/
+**/.vscode/
+
+**/bin/*
+**/obj/*
+
+**/bin
+**/obj
+**/packages
+
+**/*.cache
+**/*.pdb
