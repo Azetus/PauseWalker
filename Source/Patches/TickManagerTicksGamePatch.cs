@@ -26,7 +26,7 @@ namespace PauseWalker.Patches
             catch (Exception e)
             {
                 Log.Warning($"[PauseWalker] Exception in TickManagerTicksGamePatch: {e}");
-                return true; // 保底：原方法执行
+                return true;
             }
             return true;
         }

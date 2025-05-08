@@ -11,9 +11,18 @@ namespace PauseWalker.Patches
     public static class PreDrawPosCalculationPatch
     {
 
+        private static float GetModifiedTickRate(Pawn pawn)
+        {
+            if (PauseWalkerUtils.IsPauseWalkerPawn(pawn))
+            {
+                return 1f;
+            }
+            return Find.TickManager.TickRateMultiplier;
+        }
+
 
         private static readonly FieldInfo f_pawn = AccessTools.Field(typeof(PawnTweener), "pawn");
-        private static readonly MethodInfo m_getModifiedTickRate = AccessTools.Method(typeof(PauseWalkerUtils), nameof(PauseWalkerUtils.GetModifiedTickRate));
+        private static readonly MethodInfo m_getModifiedTickRate = AccessTools.Method(typeof(PreDrawPosCalculationPatch), nameof(GetModifiedTickRate));
 
         /**
          * 小人移动时渲染位置在 PreDrawPosCalculation 中修改

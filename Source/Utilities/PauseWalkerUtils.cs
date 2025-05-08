@@ -17,38 +17,19 @@ namespace PauseWalker.Utilities
                 }
             }
 
-
             return 0;
         }
 
-
+        // 用小人身上的状态效果(Hediff)判断该小人能否在暂停时移动
         public static bool IsPauseWalkerPawn(Pawn pawn)
         {
             if(pawn == null) return false;
 
-            //return pawn.RaceProps.Humanlike &&
-            //        pawn.story?.traits?.HasTrait(PauseWalkerTraitDefOf.PauseWalker) == true &&
-            //        pawn.Spawned &&
-            //        !pawn.Downed &&
-            //        !pawn.Dead;
+            return pawn.health.hediffSet.HasHediff(PauseWalkHediffDefOf.PauseWalkHediff);
 
-            //return IsPawnPauseWalk(pawn);
-
-            return pawn.health.hediffSet.HasHediff(PauseWalkerHediffDefOf.PauseWalkerHediff);
-
-
-
-            // return false;
         }
 
 
-        public static float GetModifiedTickRate(Pawn pawn)
-        {
-            if (IsPauseWalkerPawn(pawn))
-            {
-                return 1f;
-            }
-            return Find.TickManager.TickRateMultiplier;
-        }
+
     }
 }

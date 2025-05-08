@@ -33,7 +33,7 @@
               </li> -->
 
             <li Class="PauseWalker.CompProperties.CompProperties_AbilityEffect_PauseWalk">
-                <pawnHediff>PauseWalkerHediff</pawnHediff>
+                <pawnHediff>PauseWalkHediff</pawnHediff>
             </li>
             <li Class="CompProperties_AbilityFleckOnTarget">
                 <fleckDef>PsycastPsychicEffect</fleckDef>

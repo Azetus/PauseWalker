@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Defs>
     <HediffDef>
-        <defName>PauseWalkerHediff</defName>
+        <defName>PauseWalkHediff</defName>
         <label>pause walker</label>
         <description>Temporarily able to move while time is stopped.</description>
         <hediffClass>HediffWithComps</hediffClass>
