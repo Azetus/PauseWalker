@@ -9,7 +9,7 @@
   </PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-		<OutputPath>..\Assemblies\</OutputPath>
+		<OutputPath>..\1.5\Assemblies\</OutputPath>
 		<DebugType>none</DebugType>
 	</PropertyGroup>
 

@@ -283,7 +283,7 @@ namespace PauseWalker.Patches
                         object launcher = AccessTools.Field(thing.GetType(), "launcher").GetValue(thing);
                         if (launcher is Pawn launcherPawn)
                         {
-                            return launcherPawn.story?.traits?.HasTrait(PauseWalkerTraitDefOf.PauseWalker) == true;
+                            return PauseWalkerUtils.IsPauseWalkerPawn(launcherPawn);
 
                         }
                         //FieldInfo launcherField = thing.GetType().GetField("launcher", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
