@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+    <AbilityDef>
+        <defName>PauseWalkAbility</defName>
+        <label>Pause Walk</label>
+        <description>This pawn can move and fight even while time is paused.</description>
+        <cooldownTicksRange>60</cooldownTicksRange>
+        <hostile>false</hostile>
+        <casterMustBeCapableOfViolence>false</casterMustBeCapableOfViolence>
+        <targetRequired>false</targetRequired>
+        <!-- <statBases>
+            <Ability_Duration>15</Ability_Duration>
+        </statBases> -->
+        <verbProperties>
+            <verbClass>Verb_CastAbility</verbClass>
+            <drawAimPie>false</drawAimPie>
+            <requireLineOfSight>false</requireLineOfSight>
+            <nonInterruptingSelfCast>true</nonInterruptingSelfCast>
+
+            <warmupTime>0.25</warmupTime>
+            <range>1.0</range>
+            <targetable>false</targetable>
+            <targetParams>
+                <canTargetSelf>True</canTargetSelf>
+            </targetParams>
+        </verbProperties>
+        <comps>
+            <!-- <li Class="PauseWalker.CompProperties.CompProperties_AbilityEffect_PauseWalk"/> -->
+            <!-- <li Class="CompProperties_AbilityGiveHediff">
+                <compClass>CompAbilityEffect_GiveHediff</compClass>
+                <hediffDef>PauseWalkerHediff</hediffDef>
+                <applyToSelf>true</applyToSelf>
+              </li> -->
+
+            <li Class="PauseWalker.CompProperties.CompProperties_AbilityEffect_PauseWalk">
+                <pawnHediff>PauseWalkerHediff</pawnHediff>
+            </li>
+            <li Class="CompProperties_AbilityFleckOnTarget">
+                <fleckDef>PsycastPsychicEffect</fleckDef>
+            </li>
+        </comps>
+    </AbilityDef>
+</Defs>

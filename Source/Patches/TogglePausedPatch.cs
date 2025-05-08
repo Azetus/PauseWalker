@@ -1,5 +1,7 @@
 ﻿using HarmonyLib;
+using PauseWalker.Defs;
 using PauseWalker.Utilities;
+using RimWorld;
 using Verse;
 
 namespace PauseWalker.Patches
@@ -20,6 +22,19 @@ namespace PauseWalker.Patches
             else
             {
                 SimulatedTickManager.ClearSimTick();
+
+
+                List<Pawn> targetPawn = Find.CurrentMap.mapPawns.AllPawnsSpawned.ToList();
+
+                foreach (var pawn in targetPawn)
+                {
+                    var existing = pawn.health.hediffSet.GetFirstHediffOfDef(PauseWalkerHediffDefOf.PauseWalkerHediff);
+                    if (existing != null)
+                    {
+                        pawn.health.RemoveHediff(existing);
+                    }
+                }
+
             }
         }
     }

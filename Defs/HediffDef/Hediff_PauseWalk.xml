@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+    <HediffDef>
+        <defName>PauseWalkerHediff</defName>
+        <label>pause walker</label>
+        <description>Temporarily able to move while time is stopped.</description>
+        <hediffClass>HediffWithComps</hediffClass>
+        <isBad>false</isBad>
+        <tendable>false</tendable>
+        <comps>
+            <!-- <li Class="HediffCompProperties_Disappears">
+                <disappearsAfterTicks>300</disappearsAfterTicks>
+                <showRemainingTime>true</showRemainingTime>
+            </li> -->
+            <li Class="HediffCompProperties_DisappearsOnDeath" />
+            
+        </comps>
+    </HediffDef>
+</Defs>

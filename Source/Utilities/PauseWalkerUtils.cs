@@ -26,11 +26,19 @@ namespace PauseWalker.Utilities
         {
             if(pawn == null) return false;
 
-            return pawn.RaceProps.Humanlike &&
-                    pawn.story?.traits?.HasTrait(PauseWalkerTraitDefOf.PauseWalker) == true &&
-                    pawn.Spawned &&
-                    !pawn.Downed &&
-                    !pawn.Dead;
+            //return pawn.RaceProps.Humanlike &&
+            //        pawn.story?.traits?.HasTrait(PauseWalkerTraitDefOf.PauseWalker) == true &&
+            //        pawn.Spawned &&
+            //        !pawn.Downed &&
+            //        !pawn.Dead;
+
+            //return IsPawnPauseWalk(pawn);
+
+            return pawn.health.hediffSet.HasHediff(PauseWalkerHediffDefOf.PauseWalkerHediff);
+
+
+
+            // return false;
         }
 
 
