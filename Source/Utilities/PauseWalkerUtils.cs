@@ -1,7 +1,6 @@
 ﻿using HarmonyLib;
 using PauseWalker.Defs;
 using Verse;
-
 namespace PauseWalker.Utilities
 {
     public static class PauseWalkerUtils
@@ -10,8 +9,8 @@ namespace PauseWalker.Utilities
         {
             if (Current.Game != null && Find.TickManager != null)
             {
-                var rawTicksGame = AccessTools.Field(Find.TickManager.GetType(), "ticksGameInt").GetValue(Find.TickManager);
-                if (rawTicksGame is int ticks)
+                if(AccessTools.Field(Find.TickManager.GetType(), "ticksGameInt") is { } rawTicksGameField &&
+                    rawTicksGameField.GetValue(Find.TickManager) is int ticks)
                 {
                     return ticks;
                 }
@@ -29,7 +28,21 @@ namespace PauseWalker.Utilities
 
         }
 
+        public static bool CurrentMapContainsPauseWalker(Map currentMap)
+        {
+            if(Current.Game != null && Find.TickManager != null && currentMap != null && currentMap.mapPawns != null)
+            {
+                var spawnedPawns = currentMap.mapPawns.AllPawnsSpawned;
+                if (spawnedPawns.Count > 0) {
+                    return spawnedPawns.Any(pawn =>
+                    {
+                        return IsPauseWalkerPawn(pawn);
+                    });
+                }
+            }
 
+            return false;
+        }
 
     }
 }
