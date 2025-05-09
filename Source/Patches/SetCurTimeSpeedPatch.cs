@@ -1,16 +1,14 @@
 ﻿using HarmonyLib;
 using PauseWalker.Defs;
 using PauseWalker.Utilities;
-using RimWorld;
 using Verse;
 
 namespace PauseWalker.Patches
 {
-    // 用 Postfix 监听一下 TogglePaused 是否触发，处理 SimulatedTickManager
-    [HarmonyPatch(typeof(TickManager), nameof(TickManager.TogglePaused))]
-    public static class TogglePausedPatch
+    [HarmonyPatch(typeof(TickManager), nameof(TickManager.CurTimeSpeed), MethodType.Setter)]
+    public static class SetCurTimeSpeedPatch
     {
-        static void Postfix(TickManager __instance)
+        public static void Postfix(TickManager __instance)
         {
             TimeSpeed currentTimeSpeed = __instance.CurTimeSpeed;
             if (currentTimeSpeed == TimeSpeed.Paused)

@@ -71,8 +71,162 @@ namespace PauseWalker.Patches
             }
         }
 
+        private static int GetTickInterval(TickerType tickType)
+        {
+            switch (tickType)
+            {
+                case TickerType.Normal:
+                    return 1;
+                case TickerType.Rare:
+                    return 250;
+                case TickerType.Long:
+                    return 2000;
+                default:
+                    return -1;
+            }
+        }
+
+        private static List<Thing> BucketOf(Thing t, List<List<Thing>> thingLists, TickerType tickType)
+        {
+            int num = t.GetHashCode();
+            if (num < 0)
+            {
+                num *= -1;
+            }
+            int index = num % GetTickInterval(tickType);
+            return thingLists[index];
+        }
+
         // 绕开游戏的 TickManagerUpdate，单独执行一些 DoSingleTick() 内的内容
         private static void DoPausedTick()
+        {
+            var currentMap = Find.CurrentMap;
+            if (currentMap == null)
+                return;
+            if (!PauseWalkerUtils.CurrentMapContainsPauseWalker(currentMap))
+                return;
+            // 推进模拟时间
+            SimulatedTickManager.IncreaseSimTick();
+
+            TickList tickListNormal = (TickList)AccessTools.Field(Find.TickManager.GetType(), "tickListNormal").GetValue(Find.TickManager);
+            TickerType tickType = (TickerType)AccessTools.Field(tickListNormal.GetType(), "tickType").GetValue(tickListNormal);
+
+            List<Thing> thingsToRegister = (List<Thing>)AccessTools.Field(tickListNormal.GetType(), "thingsToRegister").GetValue(tickListNormal);
+            List<Thing> thingsToDeregister = (List<Thing>)AccessTools.Field(tickListNormal.GetType(), "thingsToDeregister").GetValue(tickListNormal);
+
+            List<List<Thing>> thingLists = (List<List<Thing>>)AccessTools.Field(tickListNormal.GetType(), "thingLists").GetValue(tickListNormal);
+            List<Thing> list2 = thingLists[Find.TickManager.TicksGame % 1];
+
+            for (int i = 0; i < thingsToRegister.Count; i++)
+            {
+                BucketOf(thingsToRegister[i], thingLists, tickType).Add(thingsToRegister[i]);
+            }
+            thingsToRegister.Clear();
+            for (int j = 0; j < thingsToDeregister.Count; j++)
+            {
+                BucketOf(thingsToDeregister[j], thingLists, tickType).Remove(thingsToDeregister[j]);
+            }
+            for (int m = 0; m < list2.Count; m++)
+            {
+                var itemToTick = list2[m];
+                if (!itemToTick.Destroyed)
+                {
+                    switch (itemToTick)
+                    {
+                        //case ThingWithComps thingWithComps:
+                        //    thingWithComps.Tick();
+                        //    break;
+                        case Pawn pawn when PauseWalkerUtils.IsPauseWalkerPawn(pawn):
+                            pawn.Tick();
+                            break;
+                        case Projectile projectile:
+                            projectile.Tick();
+                            break;
+                        case Explosion explosion:
+                            explosion.Tick();
+                            break;
+                        case Mote mote:
+                            mote.Tick();
+                            break;
+
+                        case IncineratorSpray incincerSpray:
+                            incincerSpray.Tick();
+                            break;
+                        case DelayedEffecterSpawner delayedEffecterSpawner:
+                            delayedEffecterSpawner.Tick();
+                            break;
+                            //case PowerBeam powerBeam:
+                            //    powerBeam.Tick();
+                            //    break;
+
+                            //case RadialTrigger trigger:
+                            //    trigger.Tick();
+                            //    break;
+                            //case RectTrigger rectTrigger:
+                            //    rectTrigger.Tick();
+                            //    break;
+
+
+                            //case Gas gas:
+                            //    gas.Tick();
+                            //    break;
+
+                            //case ThingWithComps thingWithComps:
+                            //    thingWithComps.Tick();
+                            //    break;
+
+                            //case Jetter jetter:
+                            //    jetter.Tick();
+                            //    break;
+
+                            //case LiquidFuel liquidFuel:
+                            //    liquidFuel.Tick();
+                            //    break;
+                            //case PowerBeam powerBeam:
+                            //    powerBeam.Tick();
+                            //    break;
+
+                            //case Thing thing:
+                            //    thing.Tick();
+                            //    break;
+                    }
+
+
+                    //if (itemToTick is Pawn pawn)
+                    //    pawn.Tick();
+                    //if (itemToTick is Mote mote)
+                    //    mote.Tick();
+
+                    //list2[m].Tick();
+                    //if (item is DelayedEffecterSpawner)
+                    //{
+                    //    item.Tick();
+                    //}
+                    //if (item is PawnFlyer)
+                    //{
+                    //    item.Tick();
+                    //}
+                    //if (item is Mote)
+                    //{
+                    //    item.Tick();
+                    //}
+                    //if (item is ThingWithComps) { 
+                    //    item.Tick();
+                    //}
+                }
+            }
+
+
+            currentMap.effecterMaintainer.EffecterMaintainerTick(); // 帝王业火炮爆炸特效
+            currentMap.flecks.FleckManagerTick();
+        }
+
+
+
+
+
+        // 绕开游戏的 TickManagerUpdate，单独执行一些 DoSingleTick() 内的内容
+        private static void DoPausedTick_old()
         {
             var currentMap = Find.CurrentMap;
             if (currentMap == null)
@@ -135,7 +289,7 @@ namespace PauseWalker.Patches
                 pawn.ProcessPostTickVisuals(ticksThisFrame, viewRect);
                 //pawn.Drawer?.tweener.ResetTweenedPosToRoot();
 
-                TickPawnCompEquipment(pawn);
+                //TickPawnCompEquipment(pawn);
                 TickCurrentMapFlecksAroundPawn(pawn, currentMap);
 
             }
@@ -146,23 +300,23 @@ namespace PauseWalker.Patches
         }
 
         // Pawn 装备相关的一些Tick需要单独调用，比如武器开火
-        private static void TickPawnCompEquipment(Pawn pawn)
-        {
-            if (pawn != null && pawn.equipment != null)
-            {
-                List<ThingWithComps> equimentList = pawn.equipment.AllEquipmentListForReading;
-                foreach (ThingWithComps equipment in equimentList.ToList())
-                {
-                    if (equipment != null && equipment.AllComps != null)
-                    {
-                        foreach (ThingComp comp in equipment.AllComps.ToList())
-                        {
-                            comp.CompTick();
-                        }
-                    }
-                }
-            }
-        }
+        //private static void TickPawnCompEquipment(Pawn pawn)
+        //{
+        //    if (pawn != null && pawn.equipment != null)
+        //    {
+        //        List<ThingWithComps> equimentList = pawn.equipment.AllEquipmentListForReading;
+        //        foreach (ThingWithComps equipment in equimentList.ToList())
+        //        {
+        //            if (equipment != null && equipment.AllComps != null)
+        //            {
+        //                foreach (ThingComp comp in equipment.AllComps.ToList())
+        //                {
+        //                    comp.CompTick();
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
 
         // 处理枪口火光
         private static void TickCurrentMapFlecksAroundPawn(Pawn pawn, Map currentMap)
@@ -289,8 +443,8 @@ namespace PauseWalker.Patches
         {
             if (map == null || map.effecterMaintainer == null)
                 return;
-            
-            if(AccessTools.Field(map.effecterMaintainer.GetType(), "maintainedEffecters") is { } maintainedEffectersField &&
+
+            if (AccessTools.Field(map.effecterMaintainer.GetType(), "maintainedEffecters") is { } maintainedEffectersField &&
                 maintainedEffectersField.GetValue(map.effecterMaintainer) is List<EffecterMaintainer.MaintainedEffecter> maintainedEffecters
                 )
             {
