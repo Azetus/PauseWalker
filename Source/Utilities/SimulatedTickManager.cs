@@ -11,7 +11,7 @@ namespace PauseWalker.Utilities
     /// 这里新建一个变量在游戏暂停时模拟时间继续推进
     /// 在游戏暂停时所有ticksGameInt的get方法都返回_simulatedTicksGameInt
     /// </summary>
-    public static class SimulatedTickManager
+    internal static class SimulatedTickManager
     {
         // 用于模拟TicksGameInt
         private static int _simulatedTicksGameInt = 0;
