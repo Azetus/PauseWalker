@@ -8,6 +8,7 @@ using UnityEngine;
 using Verse;
 using RimWorld;
 using static RimWorld.EffecterMaintainer;
+using UnityEngine.UIElements;
 
 namespace PauseWalker.Patches
 {
@@ -97,6 +98,123 @@ namespace PauseWalker.Patches
             return thingLists[index];
         }
 
+        private static bool IsPauseProjectile(Projectile projectile)
+        {
+            if (projectile == null)
+                return false;
+            if(projectile.Launcher is Pawn launcherPawn)
+            {
+                PauseWalkerUtils.IsPauseWalkerPawn(launcherPawn);
+            }
+            return false;
+        }
+        private static bool IsPauseProjectile(ThingWithComps thing)
+        {
+            if (thing == null)
+                return false;
+            if (AccessTools.Field(thing.GetType(), "launcher") is { } launcherField &&
+                        launcherField.GetValue(thing) is Pawn launcherPawn)
+            {
+                return PauseWalkerUtils.IsPauseWalkerPawn(launcherPawn);
+
+            }
+            return false;
+        }
+
+        private static bool IsPauseExplosion(Explosion explosion)
+        {
+            if (explosion != null && explosion.instigator is Pawn launcherPawn)
+            {
+                return PauseWalkerUtils.IsPauseWalkerPawn(launcherPawn);
+
+            }
+            return false;
+        }
+
+        private static bool IsPauseIncineratorSpray(IncineratorSpray spray)
+        {
+            if (spray == null)
+                return false;
+            if (Find.CurrentMap != null &&
+                Find.CurrentMap.mapPawns != null &&
+                Find.CurrentMap.mapPawns.AllPawns != null)
+            {
+                if (AccessTools.Field(spray.GetType(), "positionInt") is { } positionIntField &&
+                    positionIntField.GetValue(spray) is IntVec3 sprayPos)
+                {
+                    var pauseWalkers = Find.CurrentMap.mapPawns.AllPawns.Where(pawn =>
+                    {
+                        return PauseWalkerUtils.IsPauseWalkerPawn(pawn);
+                    });
+
+                    return pauseWalkers.Any(pawn =>
+                    {
+
+                        // 忽略掉y坐标
+                        Vector3 a = pawn.Position.ToVector3();
+                        Vector3 b = sprayPos.ToVector3();
+                        if (Vector2.Distance(new Vector2(a.x, a.z), new Vector2(b.x, b.z)) <= 1f)
+                            return true;
+                        else
+                            return false;
+                    });
+                }
+
+            }
+            return false;
+        }
+
+        private static void TickFlecks()
+        {
+            //currentMap.flecks.FleckManagerTick();
+            var currentMap = Find.CurrentMap;
+            if (currentMap == null)
+                return;
+            if (currentMap.mapPawns == null)
+                return;
+            List<Pawn> targetPawn = currentMap.mapPawns.AllPawnsSpawned
+                .Where(pawn =>
+                {
+                    return PauseWalkerUtils.IsPauseWalkerPawn(pawn);
+                }).ToList();
+
+            foreach (var pawn in targetPawn)
+            {
+                TickCurrentMapFlecksAroundPawn(pawn, currentMap);
+            }
+        }
+
+        public static bool IsPauseWalkerMote(Mote mote)
+        {
+            if (mote == null) return false;
+
+            if (mote is MoteDualAttached moteDual)
+            {
+                Pawn? pawnB1 = null;
+                Pawn? pawnB2 = null;
+                if (moteDual.link1.Target.Thing is Pawn p1){
+                    //Log.Message(mote.ToString() + " moteDual link1" + p1.ToString() + "is pausewalker " + PauseWalkerUtils.IsPauseWalkerPawn(p1));
+                    pawnB1 = p1;
+                }
+                if(AccessTools.Field(moteDual.GetType(), "link2") is { } link2Field &&
+                    link2Field.GetValue(moteDual) is MoteAttachLink link2 &&
+                    link2.Target.Thing is Pawn p2)
+                {
+                    //Log.Message(mote.ToString() + " moteDual link2" + p2.ToString() + "is pausewalker " + PauseWalkerUtils.IsPauseWalkerPawn(p2));
+                    pawnB2 = p2;
+                }
+
+                return PauseWalkerUtils.IsPauseWalkerPawn(pawnB1) || PauseWalkerUtils.IsPauseWalkerPawn(pawnB2);
+            }
+            else if (mote.link1.Target.Thing is Pawn pawnA)
+            {
+                //Log.Message(mote.ToString() + " mote link1" + pawnA.ToString() + "is pausewalker " + PauseWalkerUtils.IsPauseWalkerPawn(pawnA));
+                return PauseWalkerUtils.IsPauseWalkerPawn(pawnA);
+            }
+
+            return false;
+        }
+
         // 绕开游戏的 TickManagerUpdate，单独执行一些 DoSingleTick() 内的内容
         private static void DoPausedTick()
         {
@@ -115,7 +233,7 @@ namespace PauseWalker.Patches
             List<Thing> thingsToDeregister = (List<Thing>)AccessTools.Field(tickListNormal.GetType(), "thingsToDeregister").GetValue(tickListNormal);
 
             List<List<Thing>> thingLists = (List<List<Thing>>)AccessTools.Field(tickListNormal.GetType(), "thingLists").GetValue(tickListNormal);
-            List<Thing> list2 = thingLists[Find.TickManager.TicksGame % 1];
+            List<Thing> list2 = thingLists[Find.TickManager.TicksGame % GetTickInterval(tickType)];
 
             for (int i = 0; i < thingsToRegister.Count; i++)
             {
@@ -126,99 +244,81 @@ namespace PauseWalker.Patches
             {
                 BucketOf(thingsToDeregister[j], thingLists, tickType).Remove(thingsToDeregister[j]);
             }
+            thingsToDeregister.Clear();
             for (int m = 0; m < list2.Count; m++)
             {
                 var itemToTick = list2[m];
                 if (!itemToTick.Destroyed)
                 {
-                    switch (itemToTick)
+                    try
                     {
-                        //case ThingWithComps thingWithComps:
-                        //    thingWithComps.Tick();
-                        //    break;
-                        case Pawn pawn when PauseWalkerUtils.IsPauseWalkerPawn(pawn):
-                            pawn.Tick();
-                            break;
-                        case Projectile projectile:
-                            projectile.Tick();
-                            break;
-                        case Explosion explosion:
-                            explosion.Tick();
-                            break;
-                        case Mote mote:
-                            mote.Tick();
-                            break;
+                        switch (itemToTick)
+                        {
+                            case Pawn pawn when PauseWalkerUtils.IsPauseWalkerPawn(pawn):
+                                pawn.Tick();
+                                CellRect viewRect = Find.CameraDriver.CurrentViewRect.ExpandedBy(3);
+                                pawn.ProcessPostTickVisuals(ticksThisFrame, viewRect);
+                                break;
+                            case Projectile projectile when IsPauseProjectile(projectile):
+                                projectile.Tick();
+                                break;
+                            case ThingWithComps projectile when IsPauseProjectile(projectile):
+                                projectile.Tick();
+                                break;
+                            case Explosion explosion when IsPauseExplosion(explosion):
+                                explosion.Tick();
+                                break;
+                            case IncineratorSpray incincerSpray when IsPauseIncineratorSpray(incincerSpray):
+                                incincerSpray.Tick();
+                                break;
 
-                        case IncineratorSpray incincerSpray:
-                            incincerSpray.Tick();
-                            break;
-                        case DelayedEffecterSpawner delayedEffecterSpawner:
-                            delayedEffecterSpawner.Tick();
-                            break;
-                            //case PowerBeam powerBeam:
-                            //    powerBeam.Tick();
-                            //    break;
-
-                            //case RadialTrigger trigger:
-                            //    trigger.Tick();
-                            //    break;
-                            //case RectTrigger rectTrigger:
-                            //    rectTrigger.Tick();
+                            case Mote mote when IsPauseWalkerMote(mote):
+                                mote.Tick();
+                                break;
+                            //case DelayedEffecterSpawner delayedEffecterSpawner:
+                            //    delayedEffecterSpawner.Tick();
                             //    break;
 
-
-                            //case Gas gas:
-                            //    gas.Tick();
-                            //    break;
-
-                            //case ThingWithComps thingWithComps:
-                            //    thingWithComps.Tick();
-                            //    break;
-
-                            //case Jetter jetter:
-                            //    jetter.Tick();
-                            //    break;
-
-                            //case LiquidFuel liquidFuel:
-                            //    liquidFuel.Tick();
-                            //    break;
-                            //case PowerBeam powerBeam:
-                            //    powerBeam.Tick();
-                            //    break;
-
-                            //case Thing thing:
-                            //    thing.Tick();
-                            //    break;
+                        }
                     }
+                    catch (Exception ex)
+                    {
+                        string text = itemToTick.Spawned ? (" (at " + itemToTick.Position + ")") : "";
+                        if (Prefs.DevMode)
+                        {
+                            Log.Error(string.Concat(new object[]
+                            {
+                                "[Pause Walker] Exception ticking ",
+                                itemToTick.ToStringSafe<Thing>(),
+                                text,
+                                ": ",
+                                ex
+                            }));
+                        }
+                        else
+                        {
+                            Log.ErrorOnce(string.Concat(new object[]
+                            {
+                                "[Pause Walker] Exception ticking ",
+                                itemToTick.ToStringSafe<Thing>(),
+                                text,
+                                ". Suppressing further errors. Exception: ",
+                                ex
+                            }), itemToTick.thingIDNumber ^ 576876901);
+                        }
+                    }
+                    
 
-
-                    //if (itemToTick is Pawn pawn)
-                    //    pawn.Tick();
-                    //if (itemToTick is Mote mote)
-                    //    mote.Tick();
-
-                    //list2[m].Tick();
-                    //if (item is DelayedEffecterSpawner)
-                    //{
-                    //    item.Tick();
-                    //}
-                    //if (item is PawnFlyer)
-                    //{
-                    //    item.Tick();
-                    //}
-                    //if (item is Mote)
-                    //{
-                    //    item.Tick();
-                    //}
-                    //if (item is ThingWithComps) { 
-                    //    item.Tick();
-                    //}
                 }
             }
 
+            //currentMap.temporaryThingDrawer.Tick();//不需要调用
+            //currentMap.effecterMaintainer.EffecterMaintainerTick(); // 帝王业火炮爆炸特效
+            TickFlecks();
+            
 
-            currentMap.effecterMaintainer.EffecterMaintainerTick(); // 帝王业火炮爆炸特效
-            currentMap.flecks.FleckManagerTick();
+            
+
         }
 
 

@@ -20,7 +20,7 @@ namespace PauseWalker.Utilities
         }
 
         // 用小人身上的状态效果(Hediff)判断该小人能否在暂停时移动
-        public static bool IsPauseWalkerPawn(Pawn pawn)
+        public static bool IsPauseWalkerPawn(Pawn? pawn)
         {
             if(pawn == null) return false;
 
