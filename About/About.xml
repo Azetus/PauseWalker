@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ModMetaData>
-	<name>Pause Walker</name>
+	<name>PauseWalker</name>
 	<author>Aliza</author>
 	<packageId>Aliza.PauseWalker</packageId>
 	<supportedVersions>

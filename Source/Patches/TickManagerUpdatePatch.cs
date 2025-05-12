@@ -130,7 +130,7 @@ namespace PauseWalker.Patches
                                     case IncineratorSpray incincerSpray when IsPauseIncineratorSpray(incincerSpray):
                                         incincerSpray.Tick();
                                         break;
-                                    case Building_Door door when ShouldDoorOpen(door):
+                                    case Building_Door door when ShouldDoorOpenInPause(door):
                                         door.Tick();
                                         break;
                                     case Mote mote when IsPauseWalkerMote(mote):
@@ -261,7 +261,7 @@ namespace PauseWalker.Patches
             return thing.spawnedTick > PauseWalkerUtils.GetRawTicksGameInt();
         }
 
-        private static bool ShouldDoorOpen(Building_Door door)
+        private static bool ShouldDoorOpenInPause(Building_Door door)
         {
             if (door == null) return false;
             if(AccessTools.Field(door.GetType(), "lastFriendlyTouchTick") is { } lastFriendlyTouchTickField &&
