@@ -1,7 +1,6 @@
 ﻿using HarmonyLib;
 using PauseWalker.Defs;
 using PauseWalker.Utilities;
-using RimWorld;
 using Verse;
 
 namespace PauseWalker.Patches

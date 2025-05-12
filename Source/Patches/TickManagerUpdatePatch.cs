@@ -1,14 +1,10 @@
 ﻿using HarmonyLib;
-using Mono.Unix.Native;
 using PauseWalker.Utilities;
-using PauseWalker.Defs;
+using RimWorld;
 using System.Collections;
 using System.Diagnostics;
 using UnityEngine;
 using Verse;
-using RimWorld;
-using static RimWorld.EffecterMaintainer;
-using UnityEngine.UIElements;
 
 namespace PauseWalker.Patches
 {
