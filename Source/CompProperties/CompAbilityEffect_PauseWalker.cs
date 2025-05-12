@@ -4,13 +4,13 @@ using Verse;
 namespace PauseWalker.CompProperties
 {
 
-    public class CompAbilityEffect_PauseWalk : CompAbilityEffect
+    public class CompAbilityEffect_PauseWalker : CompAbilityEffect
     {
-        public new CompProperties_AbilityEffect_PauseWalk Props
+        public new CompProperties_AbilityEffect_PauseWalker Props
         {
             get
             {
-                return (CompProperties_AbilityEffect_PauseWalk)this.props;
+                return (CompProperties_AbilityEffect_PauseWalker)this.props;
             }
         }
 

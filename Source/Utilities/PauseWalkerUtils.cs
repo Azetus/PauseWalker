@@ -24,7 +24,7 @@ namespace PauseWalker.Utilities
         {
             if(pawn == null) return false;
 
-            return pawn.health.hediffSet.HasHediff(PauseWalkHediffDefOf.PauseWalkHediff);
+            return pawn.health.hediffSet.HasHediff(PauseWalkerHediffDefOf.PauseWalkerHediff);
 
         }
 

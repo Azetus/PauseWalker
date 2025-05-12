@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ModMetaData>
-    <name>Pause Walker</name>
-    <author>Aliza</author>
-    <packageId>Aliza.PauseWalker</packageId>
-    <supportedVersions>
-        <li>1.5</li>
-    </supportedVersions>
-    <modDependencies>
+	<name>Pause Walker</name>
+	<author>Aliza</author>
+	<packageId>Aliza.PauseWalker</packageId>
+	<supportedVersions>
+		<li>1.5</li>
+	</supportedVersions>
+	<modDependencies>
 		<li>
 			<packageId>brrainz.harmony</packageId>
 			<displayName>Harmony</displayName>
@@ -14,9 +14,12 @@
 			<downloadUrl>https://github.com/pardeike/HarmonyRimWorld/releases/latest</downloadUrl>
 		</li>
 	</modDependencies>
-    <loadAfter>
+	<loadAfter>
 		<li>Ludeon.RimWorld</li>
 		<li>brrainz.harmony</li>
 	</loadAfter>
-    <description>Pause Walker</description>
+	<description>
+这个模组添加了一个特殊能力，能够让小人在游戏暂停时继续行动。
+This mod adds a special ability that allows a pawn to continue acting even while the game is paused.
+	</description>
 </ModMetaData>

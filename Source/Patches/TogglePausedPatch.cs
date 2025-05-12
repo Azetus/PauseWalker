@@ -30,7 +30,7 @@ namespace PauseWalker.Patches
                     foreach (var pawn in targetPawn)
                     {
                         // 游戏恢复到非暂停状态时清空所有pawn的特殊状态PauseWalkHediff
-                        var existing = pawn.health.hediffSet.GetFirstHediffOfDef(PauseWalkHediffDefOf.PauseWalkHediff);
+                        var existing = pawn.health.hediffSet.GetFirstHediffOfDef(PauseWalkerHediffDefOf.PauseWalkerHediff);
                         if (existing != null)
                         {
                             pawn.health.RemoveHediff(existing);

@@ -175,8 +175,6 @@ namespace PauseWalker.Patches
                     }
                 }
             }
-
-            //currentMap.effecterMaintainer.EffecterMaintainerTick(); // 帝王业火炮爆炸特效
             TickPausedFlecks(currentMap);
             TickPausedEffecterInMap(currentMap);
         }

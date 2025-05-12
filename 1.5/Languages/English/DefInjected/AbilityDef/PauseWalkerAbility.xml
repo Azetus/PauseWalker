@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+	<PauseWalkerAbility.label>PauseWalker</PauseWalkerAbility.label>
+	<PauseWalkerAbility.description>Pausing the flow of time around them, this entity acts freely while all else halts.</PauseWalkerAbility.description>
+</LanguageData>

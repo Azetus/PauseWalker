@@ -3,13 +3,13 @@
 namespace PauseWalker.Defs
 {
     [DefOf]
-    public static class PauseWalkAbilityDefOf
+    public static class PauseWalkerAbilityDefOf
     {
-        public static AbilityDef PauseWalkAbility;
+        public static AbilityDef PauseWalkerAbility;
 
-        static PauseWalkAbilityDefOf()
+        static PauseWalkerAbilityDefOf()
         {
-            DefOfHelper.EnsureInitializedInCtor(typeof(PauseWalkAbilityDefOf));
+            DefOfHelper.EnsureInitializedInCtor(typeof(PauseWalkerAbilityDefOf));
         }
     }
 }
