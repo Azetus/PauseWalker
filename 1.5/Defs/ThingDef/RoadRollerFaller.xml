@@ -15,7 +15,7 @@
 			<explosionRadius>2</explosionRadius>
 			<explosionDamage>RoadRollerExplosion</explosionDamage>
 			<rotateGraphicTowardsDirection>true</rotateGraphicTowardsDirection>
-			<speed>0.3</speed>
+			<speed>0.8</speed>
 		</skyfaller>
 	</ThingDef>
 </Defs>
