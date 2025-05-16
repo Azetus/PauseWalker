@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+   <RoadRollerExplosion.label>压路机爆炸</RoadRollerExplosion.label>
+   <RoadRollerExplosion.deathMessage>{0} 被压路机碾成了肉饼.</RoadRollerExplosion.deathMessage>
+</LanguageData>

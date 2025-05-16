@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+    <PauseWalker.NotPauseWalker>Only a time-stopper can use this ability.</PauseWalker.NotPauseWalker>
+    <PauseWalker.NoPauseWalkerHediff>This ability can only be used in frozen time.</PauseWalker.NoPauseWalkerHediff>
+</LanguageData>

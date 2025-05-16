@@ -2,4 +2,6 @@
 <LanguageData>
 	<PauseWalkerAbility.label>PauseWalker</PauseWalkerAbility.label>
 	<PauseWalkerAbility.description>Pausing the flow of time around them, this entity acts freely while all else halts.</PauseWalkerAbility.description>
+    <DropRoadRollerAbility.label>Road Roller-Da!</DropRoadRollerAbility.label>
+    <DropRoadRollerAbility.description>Drops a road roller from the sky to deliver devastating impact.</DropRoadRollerAbility.description>
 </LanguageData>

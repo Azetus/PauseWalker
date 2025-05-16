@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+	<AbilityDef>
+		<defName>DropRoadRollerAbility</defName>
+		<label>Road Roller-Da!</label>
+		<description>Drops a road roller from the sky to deliver devastating impact.</description>
+		<cooldownTicksRange>420</cooldownTicksRange>
+		<casterMustBeCapableOfViolence>true</casterMustBeCapableOfViolence>
+		<targetRequired>true</targetRequired>
+        <hostile>true</hostile>
+        <iconPath>Icon/RoadRollerIcon</iconPath>
+		<verbProperties>
+			<verbClass>Verb_CastAbility</verbClass>
+			<range>30</range>
+			<drawAimPie>true</drawAimPie>
+			<requireLineOfSight>true</requireLineOfSight>
+			<warmupTime>7</warmupTime>
+			<targetable>true</targetable>
+			<targetParams>
+				<canTargetLocations>true</canTargetLocations>
+				<canTargetSelf>false</canTargetSelf>
+				<canTargetPawns>true</canTargetPawns>
+			</targetParams>
+		</verbProperties>
+		<comps>
+			<li Class="PauseWalker.CompProperties.CompProperties_AbilityEffect_DropRoadRoller"/>
+		</comps>
+	</AbilityDef>
+</Defs>

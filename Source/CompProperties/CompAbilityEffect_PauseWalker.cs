@@ -1,4 +1,6 @@
-﻿using RimWorld;
+﻿using PauseWalker.Defs;
+using PauseWalker.Utilities;
+using RimWorld;
 using Verse;
 
 namespace PauseWalker.CompProperties
@@ -19,12 +21,16 @@ namespace PauseWalker.CompProperties
             base.Apply(target, dest);
 
             Pawn pawn = parent.pawn;
-            var hediffDef = Props.pawnHediff;
-            if (hediffDef == null)
+            HediffDef? pauseWalkerHediffDef = Props.pawnHediff;
+            if (pauseWalkerHediffDef == null)
                 return;
+            ToggleHediffState(pawn, pauseWalkerHediffDef);
+            GainNewAbility(pawn);
+        }
 
+        private void ToggleHediffState(Pawn pawn, HediffDef pauseWalkerHediffDef) {
             // 发动技能赋予小人状态效果，再次发动时移除
-            var existing = pawn.health.hediffSet.GetFirstHediffOfDef(hediffDef);
+            var existing = pawn.health.hediffSet.GetFirstHediffOfDef(pauseWalkerHediffDef);
             if (existing != null)
             {
                 pawn.health.RemoveHediff(existing);
@@ -32,9 +38,25 @@ namespace PauseWalker.CompProperties
             }
             else
             {
-                pawn.health.AddHediff(HediffMaker.MakeHediff(hediffDef, pawn));
+                pawn.health.AddHediff(HediffMaker.MakeHediff(pauseWalkerHediffDef, pawn));
                 if (Find.TickManager.CurTimeSpeed != TimeSpeed.Paused)
                     Find.TickManager.TogglePaused();
+            }
+        }
+
+        private void GainNewAbility(Pawn pawn) {
+            Pawn_AbilityTracker? pawnAbilityTracker = pawn.abilities;
+            if (pawnAbilityTracker == null) return;
+
+            bool hasHediff = PauseWalkerUtils.HasPauseWalkerHediff(pawn);
+            bool hasAbility = pawnAbilityTracker.GetAbility(DropRoadRollerAbilityDefOf.DropRoadRollerAbility) != null;
+
+            if (!hasAbility && hasHediff)
+            {
+                pawnAbilityTracker.GainAbility(DropRoadRollerAbilityDefOf.DropRoadRollerAbility);
+            }
+            if (hasAbility && !hasHediff) {
+                pawnAbilityTracker.RemoveAbility(DropRoadRollerAbilityDefOf.DropRoadRollerAbility);
             }
         }
     }
