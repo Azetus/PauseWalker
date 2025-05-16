@@ -17,10 +17,10 @@
 					<MoveSpeed>2</MoveSpeed>
 					<IncomingDamageFactor>0.1</IncomingDamageFactor>
 					<PawnTrapSpringChance>0</PawnTrapSpringChance>
-					<MeleeDodgeChance>5</MeleeDodgeChance>
-					<MeleeDamageFactor>5</MeleeDamageFactor>
-					<MeleeHitChance>5</MeleeHitChance>
-					<ShootingAccuracyPawn>5</ShootingAccuracyPawn>
+					<MeleeDodgeChance>2</MeleeDodgeChance>
+					<MeleeDamageFactor>1.5</MeleeDamageFactor>
+					<MeleeHitChance>1.5</MeleeHitChance>
+					<ShootingAccuracyPawn>1.5</ShootingAccuracyPawn>
 				</statFactors>
 				<statOffsets>
 					<ArrestSuccessChance>1</ArrestSuccessChance>
