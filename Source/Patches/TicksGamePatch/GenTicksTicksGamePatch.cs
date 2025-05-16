@@ -2,7 +2,7 @@
 using PauseWalker.Utilities;
 using Verse;
 
-namespace PauseWalker.Patches
+namespace PauseWalker.Patches.TicksGamePatch
 {
     /// <summary>
     /// 游戏很多地方都用了 GenTicks.TicksGame 获取游戏当前时间（本质是包装了一下 TickManager.ticksGameInt 字段的get方法）。

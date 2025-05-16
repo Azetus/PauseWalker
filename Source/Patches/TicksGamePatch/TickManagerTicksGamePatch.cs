@@ -2,7 +2,7 @@
 using PauseWalker.Utilities;
 using Verse;
 
-namespace PauseWalker.Patches
+namespace PauseWalker.Patches.TicksGamePatch
 {
     [HarmonyPatch(typeof(TickManager), nameof(TickManager.TicksGame), MethodType.Getter)]
     public static class TickManagerTicksGamePatch
