@@ -30,7 +30,7 @@ namespace PauseWalker.Patches
                     foreach (var pawn in targetPawn)
                     {
                         // 游戏恢复到非暂停状态时清空所有pawn的特殊状态PauseWalkHediff
-                        PauseWalkerUtils.RemoveHediffAndAbilityFromPawn(pawn);
+                        Utils.RemoveHediffAndAbilityFromPawn(pawn);
                     }
                 }
 

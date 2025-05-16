@@ -3,7 +3,7 @@ using PauseWalker.Defs;
 using Verse;
 namespace PauseWalker.Utilities
 {
-    internal static class PauseWalkerUtils
+    internal static class Utils
     {
         public static int GetRawTicksGameInt()
         {

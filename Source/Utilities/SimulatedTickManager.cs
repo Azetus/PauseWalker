@@ -24,7 +24,7 @@ namespace PauseWalker.Utilities
                 if (_simulatedTicksGameInt != 0)
                     return _simulatedTicksGameInt;
                 else
-                    return PauseWalkerUtils.GetRawTicksGameInt();
+                    return Utils.GetRawTicksGameInt();
             }
             private set
             {
@@ -35,7 +35,7 @@ namespace PauseWalker.Utilities
         // 初始化 _simulatedTicksGameInt 等于 TickManager.TicksGame
         public static void InitSimTick()
         {
-            SimulatedTicksGameInt = PauseWalkerUtils.GetRawTicksGameInt();
+            SimulatedTicksGameInt = Utils.GetRawTicksGameInt();
         }
 
         // 将 _simulatedTicksGameInt 清零

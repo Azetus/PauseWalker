@@ -48,7 +48,7 @@ namespace PauseWalker.CompProperties
             Pawn_AbilityTracker? pawnAbilityTracker = pawn.abilities;
             if (pawnAbilityTracker == null) return;
 
-            bool hasHediff = PauseWalkerUtils.HasPauseWalkerHediff(pawn);
+            bool hasHediff = Utils.HasPauseWalkerHediff(pawn);
             bool hasAbility = pawnAbilityTracker.GetAbility(DropRoadRollerAbilityDefOf.DropRoadRollerAbility) != null;
 
             if (!hasAbility && hasHediff)

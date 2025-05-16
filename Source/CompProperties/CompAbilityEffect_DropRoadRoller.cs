@@ -17,7 +17,7 @@ namespace PauseWalker.CompProperties
         public override void Apply(LocalTargetInfo target, LocalTargetInfo dest)
         {
             Pawn pawn = parent.pawn;
-            if (!PauseWalkerUtils.IsPauseWalkerPawn(pawn))
+            if (!Utils.IsPauseWalkerPawn(pawn))
             {
                 return;
             }
@@ -34,14 +34,14 @@ namespace PauseWalker.CompProperties
         public override bool GizmoDisabled(out string reason)
         {
             Pawn pawn = parent.pawn;
-            if (!PauseWalkerUtils.IsPauseWalkerPawn(pawn)) {
+            if (!Utils.IsPauseWalkerPawn(pawn)) {
                 List<string> reasons = new List<string>();
-                if (!PauseWalkerUtils.HasPauseWalkerAbility(pawn)){
+                if (!Utils.HasPauseWalkerAbility(pawn)){
                     var notPauseWalker = "PauseWalker.NotPauseWalker".Translate();
                     reasons.Add(notPauseWalker);
                 }
 
-                if (!PauseWalkerUtils.HasPauseWalkerHediff(pawn)){
+                if (!Utils.HasPauseWalkerHediff(pawn)){
                     var noPauseWalkerHediff = "PauseWalker.NoPauseWalkerHediff".Translate();
                     reasons.Add(noPauseWalkerHediff);
                 }

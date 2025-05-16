@@ -19,7 +19,7 @@ namespace PauseWalker.Patches
             {
                 if (Find.TickManager.CurTimeSpeed == TimeSpeed.Paused)
                 {
-                    if (PauseWalkerUtils.CurrentMapContainsPauseWalker(Find.CurrentMap))
+                    if (Utils.CurrentMapContainsPauseWalker(Find.CurrentMap))
                     {
                         __result = SimulatedTickManager.SimulatedTicksGameInt;
                         return false;

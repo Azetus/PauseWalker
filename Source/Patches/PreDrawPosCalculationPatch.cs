@@ -13,7 +13,7 @@ namespace PauseWalker.Patches
 
         private static float GetModifiedTickRate(Pawn pawn)
         {
-            if (PauseWalkerUtils.IsPauseWalkerPawn(pawn))
+            if (Utils.IsPauseWalkerPawn(pawn))
             {
                 return 1f;
             }
@@ -80,7 +80,7 @@ namespace PauseWalker.Patches
                 var pawnVal = AccessTools.Field(typeof(PawnTweener), "pawn").GetValue(__instance);
                 if (pawnVal is Pawn pawn)
                 {
-                    if (PauseWalkerUtils.IsPauseWalkerPawn(pawn))
+                    if (Utils.IsPauseWalkerPawn(pawn))
                     {
                         var lastDrawFrameField = AccessTools.Field(typeof(PawnTweener), "lastDrawFrame");
                         var lastDrawTickField = AccessTools.Field(typeof(PawnTweener), "lastDrawTick");

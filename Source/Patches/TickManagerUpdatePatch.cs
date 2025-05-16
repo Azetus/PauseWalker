@@ -74,7 +74,7 @@ namespace PauseWalker.Patches
             var currentMap = Find.CurrentMap;
             if (currentMap == null)
                 return;
-            if (!PauseWalkerUtils.CurrentMapContainsPauseWalker(currentMap))
+            if (!Utils.CurrentMapContainsPauseWalker(currentMap))
                 return;
             // 参考原本 DoSingleTick 的逻辑，在这里要增加 TicksGameInt，推进游戏时间流逝，不过这里增加的是模拟时间
             SimulatedTickManager.IncreaseSimTick();
@@ -111,7 +111,7 @@ namespace PauseWalker.Patches
                             {
                                 switch (itemToTick)
                                 {
-                                    case Pawn pawn when PauseWalkerUtils.IsPauseWalkerPawn(pawn):
+                                    case Pawn pawn when Utils.IsPauseWalkerPawn(pawn):
                                         pawn.Tick();
                                         // 更新小人贴图
                                         CellRect viewRect = Find.CameraDriver.CurrentViewRect.ExpandedBy(3);
@@ -210,7 +210,7 @@ namespace PauseWalker.Patches
                 return false;
             if (projectile.Launcher is Pawn launcherPawn)
             {
-                PauseWalkerUtils.IsPauseWalkerPawn(launcherPawn);
+                Utils.IsPauseWalkerPawn(launcherPawn);
             }
             return false;
         }
@@ -223,7 +223,7 @@ namespace PauseWalker.Patches
             if (AccessTools.Field(thing.GetType(), "launcher") is { } launcherField &&
                         launcherField.GetValue(thing) is Pawn launcherPawn)
             {
-                return PauseWalkerUtils.IsPauseWalkerPawn(launcherPawn);
+                return Utils.IsPauseWalkerPawn(launcherPawn);
 
             }
             return false;
@@ -232,7 +232,7 @@ namespace PauseWalker.Patches
         private static bool IsPauseExplosion(Explosion explosion)
         {
             if (explosion != null && explosion.instigator is Pawn launcherPawn)
-                return PauseWalkerUtils.IsPauseWalkerPawn(launcherPawn);
+                return Utils.IsPauseWalkerPawn(launcherPawn);
             return false;
         }
 
@@ -240,13 +240,13 @@ namespace PauseWalker.Patches
         {
             if (spray == null)
                 return false;
-            return spray.spawnedTick > PauseWalkerUtils.GetRawTicksGameInt();
+            return spray.spawnedTick > Utils.GetRawTicksGameInt();
         }
 
         private static bool IsPauseWalkerMote(Mote mote)
         {
             if (mote == null) return false;
-            return mote.spawnedTick > PauseWalkerUtils.GetRawTicksGameInt();
+            return mote.spawnedTick > Utils.GetRawTicksGameInt();
         }
 
         private static bool IsThingAfterPause(Thing thing)
@@ -258,7 +258,7 @@ namespace PauseWalker.Patches
             if (thing is Pawn)
                 return false;
 
-            return thing.spawnedTick > PauseWalkerUtils.GetRawTicksGameInt();
+            return thing.spawnedTick > Utils.GetRawTicksGameInt();
         }
 
         private static bool ShouldDoorOpenInPause(Building_Door door)
@@ -267,7 +267,7 @@ namespace PauseWalker.Patches
             if(AccessTools.Field(door.GetType(), "lastFriendlyTouchTick") is { } lastFriendlyTouchTickField &&
                 lastFriendlyTouchTickField.GetValue(door) is int lastFriendlyTouchTick)
             {
-                return lastFriendlyTouchTick > PauseWalkerUtils.GetRawTicksGameInt();
+                return lastFriendlyTouchTick > Utils.GetRawTicksGameInt();
             }
             return false;
         }
@@ -282,7 +282,7 @@ namespace PauseWalker.Patches
                 fleckSysField.GetValue(curMapFlecksManager) is Dictionary<Type, FleckSystem> fleckSystemDic
                 )
             {
-                var currentRawTick = PauseWalkerUtils.GetRawTicksGameInt();
+                var currentRawTick = Utils.GetRawTicksGameInt();
                 var targetSys = fleckSystemDic.Values.Where(fleckSystem =>
                 {
                     if (AccessTools.Field(fleckSystem.GetType(), "dataGametime") is { } dataGameTimeField &&
@@ -334,7 +334,7 @@ namespace PauseWalker.Patches
                 for (int i = maintainedEffecters.Count - 1; i >= 0; i--)
                 {
                     EffecterMaintainer.MaintainedEffecter maintainedEffecter = maintainedEffecters[i];
-                    if(maintainedEffecter.Effecter.spawnTick > PauseWalkerUtils.GetRawTicksGameInt())
+                    if(maintainedEffecter.Effecter.spawnTick > Utils.GetRawTicksGameInt())
                     {
                         if (maintainedEffecter.Effecter.ticksLeft > 0)
                         {
