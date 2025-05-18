@@ -70,6 +70,7 @@ namespace PauseWalker.Utilities
             }
             if (HasPauseWalkerAbility(pawn)) { 
                 pawn.abilities.RemoveAbility(DropRoadRollerAbilityDefOf.DropRoadRollerAbility);
+                pawn.abilities.RemoveAbility(PauseWalker_ThrowKnifeAbilityDefOf.PauseWalker_ThrowKnife);
             }
 
         }

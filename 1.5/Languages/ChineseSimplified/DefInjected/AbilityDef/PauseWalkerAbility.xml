@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
-	<PauseWalkerAbility.label>时间停止</PauseWalkerAbility.label>
-	<PauseWalkerAbility.description>脱离时间的束缚，在万物停滞时独自行动。</PauseWalkerAbility.description>
+    <PauseWalkerAbility.label>时间停止</PauseWalkerAbility.label>
+    <PauseWalkerAbility.description>脱离时间的束缚，在万物停滞时独自行动。</PauseWalkerAbility.description>
     <DropRoadRollerAbility.label>压路机来了!</DropRoadRollerAbility.label>
     <DropRoadRollerAbility.description>从天上扔下一台压路机碾压敌人。</DropRoadRollerAbility.description>
+    <PauseWalker_ThrowKnife.label>投掷飞刀</PauseWalker_ThrowKnife.label>
+    <PauseWalker_ThrowKnife.description>向目标投掷飞刀。</PauseWalker_ThrowKnife.description>
 </LanguageData>

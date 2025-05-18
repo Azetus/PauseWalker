@@ -49,14 +49,26 @@ namespace PauseWalker.CompProperties
             if (pawnAbilityTracker == null) return;
 
             bool hasHediff = Utils.HasPauseWalkerHediff(pawn);
-            bool hasAbility = pawnAbilityTracker.GetAbility(DropRoadRollerAbilityDefOf.DropRoadRollerAbility) != null;
+            bool hasRoadRollerAbility = pawnAbilityTracker.GetAbility(DropRoadRollerAbilityDefOf.DropRoadRollerAbility) != null;
+            bool hasThrowKnifeAbility = pawnAbilityTracker.GetAbility(PauseWalker_ThrowKnifeAbilityDefOf.PauseWalker_ThrowKnife) != null;
 
-            if (!hasAbility && hasHediff)
+
+            if (!hasRoadRollerAbility && hasHediff)
             {
                 pawnAbilityTracker.GainAbility(DropRoadRollerAbilityDefOf.DropRoadRollerAbility);
             }
-            if (hasAbility && !hasHediff) {
+            if (hasRoadRollerAbility && !hasHediff) {
                 pawnAbilityTracker.RemoveAbility(DropRoadRollerAbilityDefOf.DropRoadRollerAbility);
+            }
+
+
+            if (!hasThrowKnifeAbility && hasHediff)
+            {
+                pawnAbilityTracker.GainAbility(PauseWalker_ThrowKnifeAbilityDefOf.PauseWalker_ThrowKnife);
+            }
+            if (hasThrowKnifeAbility && !hasHediff)
+            {
+                pawnAbilityTracker.RemoveAbility(PauseWalker_ThrowKnifeAbilityDefOf.PauseWalker_ThrowKnife);
             }
         }
     }
