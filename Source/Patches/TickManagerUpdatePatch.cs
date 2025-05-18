@@ -136,6 +136,9 @@ namespace PauseWalker.Patches
                                     case Mote mote when IsPauseWalkerMote(mote):
                                         mote.Tick();
                                         break;
+                                    case Skyfaller sf when IsRoadRoller(sf):
+                                        sf.Tick();
+                                        break;
                                     case Thing thing when IsThingAfterPause(thing):
                                         thing.Tick();
                                         break;
@@ -247,6 +250,11 @@ namespace PauseWalker.Patches
         {
             if (mote == null) return false;
             return mote.spawnedTick > Utils.GetRawTicksGameInt();
+        }
+
+        private static bool IsRoadRoller(Skyfaller sf)
+        {
+            return sf.Spawned && sf.Map != null && sf.def.defName.Contains("RoadRollerIncoming") && sf.spawnedTick >= Utils.GetRawTicksGameInt();
         }
 
         private static bool IsThingAfterPause(Thing thing)
