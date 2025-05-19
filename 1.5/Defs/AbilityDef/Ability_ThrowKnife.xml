@@ -8,6 +8,7 @@
         <casterMustBeCapableOfViolence>true</casterMustBeCapableOfViolence>
         <targetRequired>true</targetRequired>
         <hostile>true</hostile>
+        <iconPath>Icon/KnifeIcon</iconPath>
         <verbProperties>
             <verbClass>PauseWalker.Verbs.PauseWalkerVerb_CastAbilityBurst</verbClass>
             <warmupTime>1</warmupTime>
