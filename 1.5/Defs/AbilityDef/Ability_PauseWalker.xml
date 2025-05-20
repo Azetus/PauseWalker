@@ -25,9 +25,7 @@
         <comps>
             <li Class="PauseWalker.CompProperties.CompProperties_AbilityEffect_PauseWalker">
                 <pawnHediff>PauseWalkerHediff</pawnHediff>
-            </li>
-            <li Class="CompProperties_AbilityFleckOnTarget">
-                <fleckDef>PsycastPsychicEffect</fleckDef>
+                <effecterDef>PauseWalkerActive</effecterDef>
             </li>
         </comps>
     </AbilityDef>
