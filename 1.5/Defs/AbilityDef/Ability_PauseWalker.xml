@@ -9,6 +9,7 @@
         <casterMustBeCapableOfViolence>false</casterMustBeCapableOfViolence>
         <targetRequired>false</targetRequired>
 		<iconPath>Icon/PauseWalkerIcon</iconPath>
+        <warmupEffecter>PauseWalker_Warmup</warmupEffecter>
         <verbProperties>
             <verbClass>Verb_CastAbility</verbClass>
             <drawAimPie>false</drawAimPie>
@@ -25,7 +26,7 @@
         <comps>
             <li Class="PauseWalker.CompProperties.CompProperties_AbilityEffect_PauseWalker">
                 <pawnHediff>PauseWalkerHediff</pawnHediff>
-                <effecterDef>PauseWalkerActive</effecterDef>
+                <effecterDef>PauseWalker_Active</effecterDef>
             </li>
         </comps>
     </AbilityDef>

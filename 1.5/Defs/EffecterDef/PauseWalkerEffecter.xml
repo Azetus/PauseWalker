@@ -1,7 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Defs>
     <EffecterDef>
-        <defName>PauseWalkerActive</defName>
+        <defName>PauseWalker_Warmup</defName>
+        <children>
+            <li>
+                <subEffecterClass>SubEffecter_CameraShakeSingle</subEffecterClass>
+                <cameraShake>3</cameraShake>
+            </li>
+        </children>
+    </EffecterDef>
+    <EffecterDef>
+        <defName>PauseWalker_Active</defName>
         <maintainTicks>120</maintainTicks>
         <children>
             <li>
