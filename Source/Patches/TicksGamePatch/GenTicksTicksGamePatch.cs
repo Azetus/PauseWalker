@@ -17,15 +17,29 @@ namespace PauseWalker.Patches.TicksGamePatch
     {
         public static bool Prefix(ref int __result)
         {
-            if (Find.TickManager.CurTimeSpeed == TimeSpeed.Paused)
+            if (Current.Game == null || Find.TickManager == null)
             {
-                if (Utils.CurrentMapContainsPauseWalker(Find.CurrentMap)) {
-                    __result = SimulatedTickManager.SimulatedTicksGameInt;
-                    return false;
-                } 
+                return true;
             }
 
+            try
+            {
+                if (Find.TickManager.CurTimeSpeed == TimeSpeed.Paused)
+                {
+                    if (Utils.CurrentMapContainsPauseWalker(Find.CurrentMap))
+                    {
+                        __result = SimulatedTickManager.SimulatedTicksGameInt;
+                        return false;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Log.Warning($"[PauseWalker] Exception in GenTicksTicksGamePatch: {e}");
+                return true;
+            }
             return true;
+
         }
     }
 }
