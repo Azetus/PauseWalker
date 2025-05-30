@@ -177,7 +177,6 @@ namespace PauseWalker.Patches
                 }
             }
             TickPausedFlecks(currentMap);
-            TickPausedEffecterInMap(currentMap);
         }
 
 
@@ -329,36 +328,5 @@ namespace PauseWalker.Patches
             }
         }
 
-
-        private static void TickPausedEffecterInMap(Map map)
-        {
-            if (map == null || map.effecterMaintainer == null)
-                return;
-
-            if (AccessTools.Field(map.effecterMaintainer.GetType(), "maintainedEffecters") is { } maintainedEffectersField &&
-                maintainedEffectersField.GetValue(map.effecterMaintainer) is List<EffecterMaintainer.MaintainedEffecter> maintainedEffecters
-                )
-            {
-                for (int i = maintainedEffecters.Count - 1; i >= 0; i--)
-                {
-                    EffecterMaintainer.MaintainedEffecter maintainedEffecter = maintainedEffecters[i];
-                    if(maintainedEffecter.Effecter.spawnTick > Utils.GetRawTicksGameInt())
-                    {
-                        if (maintainedEffecter.Effecter.ticksLeft > 0)
-                        {
-                            maintainedEffecter.Effecter.EffectTick(maintainedEffecter.A, maintainedEffecter.B);
-                            maintainedEffecter.Effecter.ticksLeft--;
-                        }
-                        else
-                        {
-                            maintainedEffecter.Effecter.Cleanup();
-                            maintainedEffecters.RemoveAt(i);
-                        }
-                    }
-
-                }
-            }
-
-        }
     }
 }
