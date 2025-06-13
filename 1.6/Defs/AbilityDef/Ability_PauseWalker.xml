@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+    <AbilityDef>
+        <defName>PauseWalkerAbility</defName>
+        <label>PauseWalker</label>
+        <description>Pausing the flow of time around them, this entity acts freely while all else halts.</description>
+        <cooldownTicksRange>60</cooldownTicksRange>
+        <hostile>false</hostile>
+        <casterMustBeCapableOfViolence>false</casterMustBeCapableOfViolence>
+        <targetRequired>false</targetRequired>
+		<iconPath>Icon/PauseWalkerIcon</iconPath>
+        <warmupEffecter>PauseWalker_Warmup</warmupEffecter>
+        <verbProperties>
+            <verbClass>Verb_CastAbility</verbClass>
+            <drawAimPie>false</drawAimPie>
+            <requireLineOfSight>false</requireLineOfSight>
+            <nonInterruptingSelfCast>true</nonInterruptingSelfCast>
+
+            <warmupTime>0.25</warmupTime>
+            <range>1.0</range>
+            <targetable>false</targetable>
+            <targetParams>
+                <canTargetSelf>True</canTargetSelf>
+            </targetParams>
+        </verbProperties>
+        <comps>
+            <li Class="PauseWalker.CompProperties.CompProperties_AbilityEffect_PauseWalker">
+                <pawnHediff>PauseWalkerHediff</pawnHediff>
+                <effecterDef>PauseWalker_Active</effecterDef>
+            </li>
+        </comps>
+    </AbilityDef>
+</Defs>

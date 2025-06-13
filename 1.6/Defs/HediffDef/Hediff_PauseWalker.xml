@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+	<HediffDef>
+		<defName>PauseWalkerHediff</defName>
+		<label>Out of Sync</label>
+		<description>An unknown force surges within their body. This entity is temporarily detached from the flow of time, continuing onward through frozen moments.</description>
+		<hediffClass>HediffWithComps</hediffClass>
+		<isBad>false</isBad>
+		<tendable>false</tendable>
+		<comps>
+			<li Class="HediffCompProperties_DisappearsOnDeath" />
+		</comps>
+		<stages>
+			<li>
+				<statFactors>
+					<CrawlSpeed>2</CrawlSpeed>
+					<MoveSpeed>2</MoveSpeed>
+					<IncomingDamageFactor>0.1</IncomingDamageFactor>
+					<PawnTrapSpringChance>0</PawnTrapSpringChance>
+					<MeleeDodgeChance>2</MeleeDodgeChance>
+					<MeleeDamageFactor>1.5</MeleeDamageFactor>
+					<MeleeHitChance>1.5</MeleeHitChance>
+					<ShootingAccuracyPawn>1.5</ShootingAccuracyPawn>
+				</statFactors>
+				<statOffsets>
+					<ArrestSuccessChance>1</ArrestSuccessChance>
+					<AimingDelayFactor>-0.5</AimingDelayFactor>
+					<MeleeCooldownFactor>-0.5</MeleeCooldownFactor>
+				</statOffsets>
+			</li>
+		</stages>
+	</HediffDef>
+</Defs>

@@ -76,9 +76,18 @@ namespace PauseWalker.Patches
                 return;
             if (!Utils.CurrentMapContainsPauseWalker(currentMap))
                 return;
+            // MapPreTick
+            TickPathFinder(currentMap);
             // 参考原本 DoSingleTick 的逻辑，在这里要增加 TicksGameInt，推进游戏时间流逝，不过这里增加的是模拟时间
             SimulatedTickManager.IncreaseSimTick();
+            DoTickListNormal();
+            // MapPostTick
+            TickPausedFlecks(currentMap);
 
+        }
+
+        private static void DoTickListNormal()
+        {
             if (AccessTools.Field(Find.TickManager.GetType(), "tickListNormal")?.GetValue(Find.TickManager) is TickList tickListNormal &&
                 AccessTools.Field(tickListNormal.GetType(), "tickType")?.GetValue(tickListNormal) is TickerType tickType &&
                 AccessTools.Field(tickListNormal.GetType(), "thingsToRegister")?.GetValue(tickListNormal) is List<Thing> thingsToRegister &&
@@ -112,35 +121,35 @@ namespace PauseWalker.Patches
                                 switch (itemToTick)
                                 {
                                     case Pawn pawn when Utils.IsPauseWalkerPawn(pawn):
-                                        pawn.Tick();
+                                        pawn.DoTick();
                                         // 更新小人贴图
                                         CellRect viewRect = Find.CameraDriver.CurrentViewRect.ExpandedBy(3);
                                         pawn.ProcessPostTickVisuals(ticksThisFrame, viewRect);
                                         break;
                                     // 处理投射物
                                     case Projectile projectile when IsPauseProjectile(projectile):
-                                        projectile.Tick();
+                                        projectile.DoTick();
                                         break;
                                     case ThingWithComps projectile when IsPauseProjectile(projectile):
-                                        projectile.Tick();
+                                        projectile.DoTick();
                                         break;
                                     case Explosion explosion when IsPauseExplosion(explosion):
-                                        explosion.Tick();
+                                        explosion.DoTick();
                                         break;
                                     case IncineratorSpray incincerSpray when IsPauseIncineratorSpray(incincerSpray):
-                                        incincerSpray.Tick();
+                                        incincerSpray.DoTick();
                                         break;
                                     case Building_Door door when ShouldDoorOpenInPause(door):
-                                        door.Tick();
+                                        door.DoTick();
                                         break;
                                     case Mote mote when IsPauseWalkerMote(mote):
-                                        mote.Tick();
+                                        mote.DoTick();
                                         break;
                                     case Skyfaller sf when IsRoadRoller(sf):
-                                        sf.Tick();
+                                        sf.DoTick();
                                         break;
                                     case Thing thing when IsThingAfterPause(thing):
-                                        thing.Tick();
+                                        thing.DoTick();
                                         break;
                                 }
                             }
@@ -176,9 +185,23 @@ namespace PauseWalker.Patches
                     }
                 }
             }
-            TickPausedFlecks(currentMap);
+
         }
 
+        private static void TickPathFinder(Map currentMap)
+        {
+            if (currentMap == null) return;
+
+            try
+            {
+                currentMap.pathFinder.PathFinderTick();
+            }
+            catch (Exception ex3)
+            {
+                Log.Error(ex3.ToString());
+            }
+
+        }
 
         private static int GetTickInterval(TickerType tickType)
         {

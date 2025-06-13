@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+	<ThingDef ParentName="SkyfallerBase">
+		<defName>RoadRollerIncoming</defName>
+		<label>RoadRoller (falling)</label>
+		<size>(2, 2)</size>
+		<graphicData>
+			<texPath>Things/RoadRoller</texPath>
+			<graphicClass>Graphic_Single</graphicClass>
+			<shaderType>Transparent</shaderType>
+			<drawSize>(4, 4)</drawSize>
+		</graphicData>
+		<skyfaller>
+			<shadowSize>(3, 3)</shadowSize>
+			<explosionRadius>2</explosionRadius>
+			<explosionDamage>RoadRollerExplosion</explosionDamage>
+			<rotateGraphicTowardsDirection>true</rotateGraphicTowardsDirection>
+			<speed>0.8</speed>
+		</skyfaller>
+	</ThingDef>
+</Defs>

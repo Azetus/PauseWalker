@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+    <AbilityDef>
+        <defName>PauseWalker_ThrowKnife</defName>
+        <label>throw knife</label>
+        <description>Throw a deadly knife at the target.</description>
+        <cooldownTicksRange>60</cooldownTicksRange>
+        <casterMustBeCapableOfViolence>true</casterMustBeCapableOfViolence>
+        <targetRequired>true</targetRequired>
+        <hostile>true</hostile>
+        <iconPath>Icon/KnifeIcon</iconPath>
+        <verbProperties>
+            <verbClass>PauseWalker.Verbs.PauseWalkerVerb_CastAbilityBurst</verbClass>
+            <warmupTime>1</warmupTime>
+            <range>10</range>
+            <soundCast>InfernoCannon_Fire</soundCast>
+            <ticksBetweenBurstShots>6</ticksBetweenBurstShots>
+            <burstShotCount>3</burstShotCount>
+            <targetParams>
+                <canTargetSelf>false</canTargetSelf>
+                <canTargetPawns>true</canTargetPawns>
+                <canTargetBuildings>true</canTargetBuildings>
+                <canTargetLocations>true</canTargetLocations>
+            </targetParams>
+        </verbProperties>
+        <comps>
+            <li Class="CompProperties_AbilityLaunchProjectile">
+                <projectileDef>PauseWalker_Knife_Projectile</projectileDef>
+            </li>
+        </comps>
+    </AbilityDef>
+</Defs>

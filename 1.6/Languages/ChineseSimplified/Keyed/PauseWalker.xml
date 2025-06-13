@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+    <PauseWalker.NotPauseWalker>只有时停者能够使用这个能力.</PauseWalker.NotPauseWalker>
+    <PauseWalker.NoPauseWalkerHediff>该能力只能在静止的时间中使用.</PauseWalker.NoPauseWalkerHediff>
+</LanguageData>
