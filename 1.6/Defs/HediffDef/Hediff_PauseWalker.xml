@@ -9,6 +9,9 @@
 		<tendable>false</tendable>
 		<comps>
 			<li Class="HediffCompProperties_DisappearsOnDeath" />
+			<li Class="PauseWalker.CompProperties.PauseWalkerHediffCompProperties_Regenerate">
+				<healAmount>100</healAmount>
+			</li>
 		</comps>
 		<stages>
 			<li>

@@ -4,6 +4,7 @@
         <defName>PauseWalkerAbility</defName>
         <label>PauseWalker</label>
         <description>Pausing the flow of time around them, this entity acts freely while all else halts.</description>
+		<abilityClass>PauseWalker.CustomAbility.PauseWalkerAbility</abilityClass>
         <cooldownTicksRange>60</cooldownTicksRange>
         <hostile>false</hostile>
         <casterMustBeCapableOfViolence>false</casterMustBeCapableOfViolence>
