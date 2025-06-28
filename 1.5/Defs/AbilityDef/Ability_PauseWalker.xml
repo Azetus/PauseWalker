@@ -10,6 +10,8 @@
         <targetRequired>false</targetRequired>
 		<iconPath>Icon/PauseWalkerIcon</iconPath>
         <warmupEffecter>PauseWalker_Warmup</warmupEffecter>
+        <displayGizmoWhileUndrafted>true</displayGizmoWhileUndrafted>
+        <disableGizmoWhileUndrafted>false</disableGizmoWhileUndrafted>
         <verbProperties>
             <verbClass>Verb_CastAbility</verbClass>
             <drawAimPie>false</drawAimPie>

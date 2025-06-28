@@ -21,6 +21,7 @@
 					<MeleeDamageFactor>1.5</MeleeDamageFactor>
 					<MeleeHitChance>1.5</MeleeHitChance>
 					<ShootingAccuracyPawn>1.5</ShootingAccuracyPawn>
+                    <RangedCooldownFactor>0</RangedCooldownFactor>
 				</statFactors>
 				<statOffsets>
 					<ArrestSuccessChance>1</ArrestSuccessChance>
