@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+    <HediffDef>
+        <defName>PauseWalkerResurrectHediff</defName>
+        <label>PauseWalkerResurrectMark</label>
+        <description>Template desc</description>
+        <hediffClass>PauseWalker.Hediffs.PauseWalkerResurrectHediff</hediffClass>
+        <isBad>false</isBad>
+        <tendable>false</tendable>
+        <alwaysShowSeverity>false</alwaysShowSeverity>
+        <showGizmosOnCorpse>true</showGizmosOnCorpse>
+        <preventsDeath>true</preventsDeath>
+    </HediffDef>
+</Defs>

@@ -75,5 +75,11 @@ namespace PauseWalker.Utilities
 
         }
 
+
+        public static bool HasUsableCorpse(Pawn pawn)
+        {
+            Corpse corpse = pawn.Corpse;
+            return corpse != null && !corpse.Destroyed && corpse.Spawned && corpse.MapHeld != null;
+        }
     }
 }

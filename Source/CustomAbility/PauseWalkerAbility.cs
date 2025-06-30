@@ -1,4 +1,7 @@
-﻿using RimWorld;
+﻿using PauseWalker.Defs;
+using PauseWalker.Hediffs;
+using PauseWalker.ModGameComponent;
+using RimWorld;
 using RimWorld.Planet;
 using Verse;
 using Verse.AI.Group;
@@ -8,10 +11,37 @@ namespace PauseWalker.CustomAbility
     public class PauseWalkerAbility : Ability
     {
         public PauseWalkerAbility() : base() { }
-        public PauseWalkerAbility(Pawn pawn) : base(pawn) { }
-        public PauseWalkerAbility(Pawn pawn, Precept sourcePrecept):base(pawn, sourcePrecept) { }
-        public PauseWalkerAbility(Pawn pawn, AbilityDef def):base(pawn, def) { }
-        public PauseWalkerAbility(Pawn pawn, Precept sourcePrecept, AbilityDef def) : base(pawn, sourcePrecept, def) { }
+        public PauseWalkerAbility(Pawn pawn) : base(pawn) {
+            this.RegistToManager();
+            this.AddResurrectionHediff();
+        }
+        public PauseWalkerAbility(Pawn pawn, Precept sourcePrecept):base(pawn, sourcePrecept) {
+            this.RegistToManager();
+            this.AddResurrectionHediff();
+        }
+        public PauseWalkerAbility(Pawn pawn, AbilityDef def):base(pawn, def) {
+            this.RegistToManager();
+            this.AddResurrectionHediff();
+        }
+        public PauseWalkerAbility(Pawn pawn, Precept sourcePrecept, AbilityDef def) : base(pawn, sourcePrecept, def) {
+            this.RegistToManager();
+            this.AddResurrectionHediff();
+        }
+
+        private void RegistToManager()
+        {
+            if(this.pawn != null)
+                Current.Game.GetComponent<PauseWalkerManager>()?.RegisterThroughAbility(pawn);
+        }
+
+        private void AddResurrectionHediff()
+        {
+            if (pawn != null && !pawn.health.hediffSet.HasHediff(PauseWalkerResurrectHediffDefOf.PauseWalkerResurrectHediff))
+            {
+                pawn.health.AddHediff(PauseWalkerResurrectHediffDefOf.PauseWalkerResurrectHediff);
+            }
+        }
+
         override public bool GizmoDisabled(out string reason)
         {
             if (this.CanCooldown && this.OnCooldown && (!this.def.cooldownPerCharge || this.RemainingCharges == 0))

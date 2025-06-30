@@ -19,16 +19,6 @@ namespace PauseWalker.CompProperties
 
             if (regenBudget <= 0f || Pawn?.health == null) return;
 
-            // 疤痕
-            var candidates = Pawn.health.hediffSet.hediffs
-                .Where(hd => hd.IsPermanent() || hd.def.chronic)
-                .ToList();
-
-            if (candidates.TryRandomElement(out Hediff toCure))
-            {
-                HealthUtility.Cure(toCure);
-            }
-
             // 伤口
             Pawn.health.hediffSet.GetHediffs<Hediff_Injury>(ref tmpInjuries, (Hediff_Injury h) => !h.IsPermanent() && h.Severity > 0f);
             foreach (var injury in tmpInjuries)
@@ -40,6 +30,18 @@ namespace PauseWalker.CompProperties
                 if (regenBudget <= 0f) return;
             }
 
+            // 失血
+            Hediff bloodLoss = Pawn.health.hediffSet.GetFirstHediffOfDef(HediffDefOf.BloodLoss);
+            if (bloodLoss != null && bloodLoss.Severity > 0f)
+            {
+                float healAmount = Mathf.Min(regenBudget, bloodLoss.Severity);
+                bloodLoss.Severity -= healAmount;
+                regenBudget -= healAmount;
+                Pawn.health.hediffSet.Notify_Regenerated(healAmount);
+
+                if (regenBudget <= 0f) return;
+            }
+
             // 身体部位
             Pawn.health.hediffSet.GetHediffs<Hediff_MissingPart>(ref tmpMissingParts, h =>
                 h.Part.parent != null &&
@@ -47,6 +49,18 @@ namespace PauseWalker.CompProperties
                 Pawn.health.hediffSet.GetFirstHediffMatchingPart<Hediff_MissingPart>(h.Part.parent) == null &&
                 Pawn.health.hediffSet.GetFirstHediffMatchingPart<Hediff_AddedPart>(h.Part.parent) == null
             );
+
+
+            // 疤痕
+            var candidates = Pawn.health.hediffSet.hediffs
+                .Where(hd => hd.IsPermanent() || hd.def.chronic)
+                .ToList();
+
+            if (candidates.TryRandomElement(out Hediff toCure))
+            {
+                HealthUtility.Cure(toCure);
+            }
+
 
             if (tmpMissingParts.Any())
             {
@@ -67,7 +81,7 @@ namespace PauseWalker.CompProperties
 
     public class PauseWalkerHediffCompProperties_Regenerate : HediffCompProperties
     {
-        public float healAmount = 100.0f;
+        public float healAmount;
 
         public PauseWalkerHediffCompProperties_Regenerate()
         {

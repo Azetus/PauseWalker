@@ -10,7 +10,7 @@
 		<comps>
 			<li Class="HediffCompProperties_DisappearsOnDeath" />
 			<li Class="PauseWalker.CompProperties.PauseWalkerHediffCompProperties_Regenerate">
-				<healAmount>100</healAmount>
+				<healAmount>1</healAmount>
 			</li>
 		</comps>
 		<stages>
