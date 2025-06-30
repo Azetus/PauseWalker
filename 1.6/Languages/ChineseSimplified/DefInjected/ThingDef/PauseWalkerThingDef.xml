@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
     <PauseWalker_Knife_Projectile.label>飞刀</PauseWalker_Knife_Projectile.label>
+    <PauseWalker_Neurotrainer.label>技能训练器 (时间停止)</PauseWalker_Neurotrainer.label>
+    <PauseWalker_Neurotrainer.description>一个一次性使用的技能训练器，使用后可以获得控制时间的力量。</PauseWalker_Neurotrainer.description>
+    <PauseWalker_Neurotrainer.comps.CompUsable.useLabel>使用{0_label}</PauseWalker_Neurotrainer.comps.CompUsable.useLabel>
 </LanguageData>
