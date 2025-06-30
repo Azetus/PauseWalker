@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+    <ThingDef>
+        <defName>PauseWalker_Neurotrainer</defName>
+        <label>Neurotrainer (PauseWalker)</label>
+        <thingClass>ThingWithComps</thingClass>
+        <category>Item</category>
+        <altitudeLayer>Item</altitudeLayer>
+        <selectable>true</selectable>
+        <graphicData>
+            <texPath>Things/PauseWalkerNeurotrainer</texPath>
+            <graphicClass>Graphic_Single</graphicClass>
+            <drawSize>(1,1)</drawSize>
+        </graphicData>
+        <statBases>
+            <MarketValue>20000</MarketValue>
+            <Mass>0.2</Mass>
+            <MaxHitPoints>80.0</MaxHitPoints>
+            <DeteriorationRate>2.0</DeteriorationRate>
+            <Flammability>0.2</Flammability>
+        </statBases>
+        <techLevel>Ultra</techLevel>
+        <alwaysHaulable>True</alwaysHaulable>
+        <rotatable>False</rotatable>
+        <pathCost>14</pathCost>
+        <tradeTags>
+            <li>ExoticMisc</li>
+        </tradeTags>
+        <stackLimit>1</stackLimit>
+        <tradeNeverStack>True</tradeNeverStack>
+        <forceDebugSpawnable>True</forceDebugSpawnable>
+        <drawerType>MapMeshOnly</drawerType>
+        <comps>
+            <li Class="CompProperties_UseEffectPlaySound">
+                <soundOnUsed>MechSerumUsed</soundOnUsed>
+            </li>
+            <li Class="CompProperties_UseEffectDestroySelf" />
+            <li Class="CompProperties_Forbiddable" />
+            <li Class="CompProperties_Usable">
+                <useJob>UseNeurotrainer</useJob>
+                <useLabel>Use {0_label}</useLabel>
+                <showUseGizmo>true</showUseGizmo>
+            </li>
+            <li Class="PauseWalker.CompProperties.CompProperties_UseEffect_GainAbilityWithoutPsyLink">
+                <ability>PauseWalkerAbility</ability>
+            </li>
+        </comps>
+        <thingCategories>
+            <li>NeurotrainersSkill</li>
+        </thingCategories>
+        <thingSetMakerTags>
+            <li>RewardStandardHighFreq</li>
+        </thingSetMakerTags>
+    </ThingDef>
+</Defs>
