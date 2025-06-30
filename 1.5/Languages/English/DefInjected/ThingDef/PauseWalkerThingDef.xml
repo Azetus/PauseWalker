@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
     <PauseWalker_Knife_Projectile.label>throwing knife</PauseWalker_Knife_Projectile.label>
+    <PauseWalker_Neurotrainer.label>Neurotrainer (PauseWalker)</PauseWalker_Neurotrainer.label>
+    <PauseWalker_Neurotrainer.description>A one-use super-dose of mechanites that bestows the ability to manipulate time itself.</PauseWalker_Neurotrainer.description>
+    <PauseWalker_Neurotrainer.comps.CompUsable.useLabel>Use {0_label}</PauseWalker_Neurotrainer.comps.CompUsable.useLabel>
 </LanguageData>
