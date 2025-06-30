@@ -7,6 +7,9 @@
         <category>Item</category>
         <altitudeLayer>Item</altitudeLayer>
         <selectable>true</selectable>
+        <descriptionHyperlinks>
+            <AbilityDef>PauseWalkerAbility</AbilityDef>
+        </descriptionHyperlinks>
         <graphicData>
             <texPath>Things/PauseWalkerNeurotrainer</texPath>
             <graphicClass>Graphic_Single</graphicClass>
