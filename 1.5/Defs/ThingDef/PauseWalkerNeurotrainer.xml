@@ -16,7 +16,7 @@
             <drawSize>(1,1)</drawSize>
         </graphicData>
         <statBases>
-            <MarketValue>20000</MarketValue>
+            <MarketValue>30000</MarketValue>
             <Mass>0.2</Mass>
             <MaxHitPoints>80.0</MaxHitPoints>
             <DeteriorationRate>2.0</DeteriorationRate>
@@ -28,6 +28,7 @@
         <pathCost>14</pathCost>
         <tradeTags>
             <li>ExoticMisc</li>
+            <li>Artifact</li>
         </tradeTags>
         <stackLimit>1</stackLimit>
         <tradeNeverStack>True</tradeNeverStack>
@@ -50,9 +51,11 @@
         </comps>
         <thingCategories>
             <li>NeurotrainersSkill</li>
+            <li>Artifacts</li>
         </thingCategories>
         <thingSetMakerTags>
-            <li>RewardStandardHighFreq</li>
+            <li>RewardStandardLowFreq</li>
         </thingSetMakerTags>
+        <generateCommonality>0.1</generateCommonality>
     </ThingDef>
 </Defs>
