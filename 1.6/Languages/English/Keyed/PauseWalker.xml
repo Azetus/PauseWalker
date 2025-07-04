@@ -2,4 +2,9 @@
 <LanguageData>
     <PauseWalker.NotPauseWalker>Only a time-stopper can use this ability.</PauseWalker.NotPauseWalker>
     <PauseWalker.NoPauseWalkerHediff>This ability can only be used in frozen time.</PauseWalker.NoPauseWalkerHediff>
+    <PauseWalker.PauseWalkerReturnLetterName>Return of {0}</PauseWalker.PauseWalkerReturnLetterName>
+    <PauseWalker.PauseWalkerReturnLetterText>The body of {0} seems to have been completely destroyed. {0} can reverse time to reconstruct their body and rejoin your colony, but you need to designate a location for the reconstruction.</PauseWalker.PauseWalkerReturnLetterText>
+    <PauseWalker.ReviveLabel>Time Reversal Field</PauseWalker.ReviveLabel>
+    <PauseWalker.ReviveDesc>Activate a time reversal field over the corpse, restoring the body to its pre-death state.</PauseWalker.ReviveDesc>
+    <PauseWalker.ReviveMessage>{0} has been resurrected.</PauseWalker.ReviveMessage>
 </LanguageData>

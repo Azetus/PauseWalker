@@ -2,4 +2,9 @@
 <LanguageData>
     <PauseWalker.NotPauseWalker>只有时停者能够使用这个能力.</PauseWalker.NotPauseWalker>
     <PauseWalker.NoPauseWalkerHediff>该能力只能在静止的时间中使用.</PauseWalker.NoPauseWalkerHediff>
+    <PauseWalker.PauseWalkerReturnLetterName>{0} 的回归</PauseWalker.PauseWalkerReturnLetterName>
+    <PauseWalker.PauseWalkerReturnLetterText>{0} 的躯体似乎被完全摧毁了, {0} 可以逆转时间重构自己的身体并重新加入你的殖民地, 不过需要你指引身体重构的地点.</PauseWalker.PauseWalkerReturnLetterText>
+    <PauseWalker.ReviveLabel>逆时场</PauseWalker.ReviveLabel>
+    <PauseWalker.ReviveDesc>激活一个逆时场覆盖尸体, 能够将身体恢复至死前的状态.</PauseWalker.ReviveDesc>
+    <PauseWalker.ReviveMessage>{0} 已经复活.</PauseWalker.ReviveMessage>
 </LanguageData>

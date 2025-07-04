@@ -1,13 +1,15 @@
-﻿using Verse;
-using RimWorld;
+﻿using PauseWalker.Defs;
+using PauseWalker.Letter;
 using PauseWalker.Utilities;
+using RimWorld;
 using RimWorld.Planet;
+using Verse;
 
 namespace PauseWalker.ModGameComponent
 {
     public class PauseWalkerManager : GameComponent
     {
-        private Dictionary<string, Pawn> tracked = new Dictionary<string, Pawn>();
+        private Dictionary<int, Pawn> tracked = new Dictionary<int, Pawn>();
         private int checkInterval = 60;
         private int tickCounter = 0;
 
@@ -23,15 +25,19 @@ namespace PauseWalker.ModGameComponent
             tickCounter++;
             if (tickCounter % checkInterval != 0) return;
 
+            // 定期检查一下有没有不在 tracked 中的 pawn
             if (tickCounter % (checkInterval * 10) == 0)
             {
 
-                List<Pawn> pauseWalkers = PawnsFinder.All_AliveOrDead.FindAll(p => Utils.HasPauseWalkerAbility(p));
+                List<Pawn> pauseWalkers = PawnsFinder.All_AliveOrDead.FindAll(p =>
+                {
+                    return Utils.HasPauseWalkerAbility(p) && p.IsColonist;
+                });
                 foreach (var item in pauseWalkers)
                 {
-                    if (!tracked.ContainsKey(item.ThingID))
+                    if (!tracked.ContainsKey(item.thingIDNumber))
                     {
-                        Log.Message("[PauseWalker] 发现未注册的PauseWalker" + item.Name);
+                        Log.Message("[PauseWalker] found unregisted PauseWalker" + item.Name);
                         this.Register(item);
                     }
                 }
@@ -40,8 +46,9 @@ namespace PauseWalker.ModGameComponent
             }
 
 
+            HashSet<int> toBeRemoved = new HashSet<int>();
 
-
+            // 检测是否有需要复活的 pawn
             foreach (var pair in tracked.ToList())
             {
                 var id = pair.Key;
@@ -50,34 +57,40 @@ namespace PauseWalker.ModGameComponent
                 Log.Message("[PauseWalker] Current PauseWalker id: " + id + " Name: " + trackedPawn.Name);
                 Log.Message("[PauseWalker] Current PauseWalker id: " + id + " Dead: " + trackedPawn.Dead + " Destroyed: " + trackedPawn.Destroyed + " Discarded: " + trackedPawn.Discarded);
 
-                if (trackedPawn == null) continue;
-                if (!trackedPawn.IsColonist) continue;
-                if(!trackedPawn.Dead &&trackedPawn.MapHeld != null) continue;
+                if (trackedPawn == null)
+                {
+                    toBeRemoved.Add(id);
+                    continue;
+                }
+                if (!Utils.HasPauseWalkerAbility(trackedPawn))
+                {
+                    toBeRemoved.Add(id);
+                    continue;
+                }
+                if (!trackedPawn.IsColonist)
+                {
+                    toBeRemoved.Add(id);
+                    continue;
+                }
+                if (!trackedPawn.Dead && trackedPawn.MapHeld != null) continue;
                 //if(!trackedPawn.Dead && trackedPawn.IsFreeColonist) continue;
 
                 if (trackedPawn.Dead && !Utils.HasUsableCorpse(trackedPawn))
                 {
-                    Messages.Message(trackedPawn.Name + " is revived", trackedPawn, MessageTypeDefOf.PositiveEvent);
-                    TryRevive(trackedPawn);
+                    TryReviveThroughLetter(trackedPawn);
                 }
 
                 if (trackedPawn.Destroyed && !Utils.HasUsableCorpse(trackedPawn))
                 {
-                    //trackedPawn.Kill(null);
-                    Messages.Message(trackedPawn.Name + " is destroyed but revived", trackedPawn, MessageTypeDefOf.PositiveEvent);
-                    //TryRevive(trackedPawn);
-                    trackedPawn.ForceSetStateToUnspawned();
-                    GenSpawn.Spawn(trackedPawn, CellFinder.RandomClosewalkCellNear(MapGenerator.PlayerStartSpot, Find.CurrentMap, 5), Find.CurrentMap);
+                    TryReviveDestroyedThroughLetter(trackedPawn);
                 }
 
-                if (trackedPawn.Discarded && !Utils.HasUsableCorpse(trackedPawn))
-                {
-                    //trackedPawn.Kill(null);
-                    Messages.Message(trackedPawn.Name + " is discarded but revived", trackedPawn, MessageTypeDefOf.PositiveEvent);
-                    //TryRevive(trackedPawn);
-                    trackedPawn.ForceSetStateToUnspawned();
-                    GenSpawn.Spawn(trackedPawn, CellFinder.RandomClosewalkCellNear(MapGenerator.PlayerStartSpot, Find.CurrentMap, 5), Find.CurrentMap);
-                }
+                //if (trackedPawn.Discarded && !Utils.HasUsableCorpse(trackedPawn))
+                //{
+                //    Messages.Message(trackedPawn.Name + " is discarded but revived", trackedPawn, MessageTypeDefOf.PositiveEvent);
+                //    trackedPawn.ForceSetStateToUnspawned();
+                //    TryReviveThroughLetter(trackedPawn);
+                //}
 
                 if (!trackedPawn.Dead)
                 {
@@ -89,10 +102,57 @@ namespace PauseWalker.ModGameComponent
 
             }
 
+            foreach (var id in toBeRemoved)
+            {
+                tracked.Remove(id);
+            }
 
 
         }
 
+
+        private void TryReviveThroughLetter(Pawn pawn)
+        {
+            if (!LetterStackExists(pawn))
+            {
+                Log.Message($"[PauseWalker] Try revive pawn through letter: {pawn}");
+                ChoiceLetter_PauseWalkerReturn letter = MakePauseWalkerLetter(pawn);
+                Find.LetterStack.ReceiveLetter(letter, null, 0, true);
+            }
+        }
+
+        private void TryReviveDestroyedThroughLetter(Pawn pawn)
+        {
+            if (!LetterStackExists(pawn))
+            {
+                Log.Message($"[PauseWalker] Try revive destroyed pawn through letter: {pawn}");
+                //pawn.ForceSetStateToUnspawned();
+                ChoiceLetter_PauseWalkerReturn letter = MakePauseWalkerLetter(pawn);
+                Find.LetterStack.ReceiveLetter(letter, null, 0, true);
+            }
+        }
+
+        private bool LetterStackExists(Pawn pawn)
+        {
+            return Find.LetterStack.LettersListForReading.Exists(L =>
+            {
+                if (L is ChoiceLetter_PauseWalkerReturn pauseWalkerLetter && pauseWalkerLetter.Pawn == pawn)
+                {
+                    return true;
+                }
+                return false;
+            });
+        }
+
+        private ChoiceLetter_PauseWalkerReturn MakePauseWalkerLetter(Pawn pawn)
+        {
+            ChoiceLetter_PauseWalkerReturn letter = (ChoiceLetter_PauseWalkerReturn)LetterMaker.MakeLetter(PauseWalkerReturnLetterDefOf.PauseWalkerReturnLetter);
+            letter.Pawn = pawn;
+            letter.Label = "PauseWalker.PauseWalkerReturnLetterName".Translate(pawn);
+            letter.Text = "PauseWalker.PauseWalkerReturnLetterText".Translate(pawn);
+            letter.PawnThingIDNumber = pawn.thingIDNumber;
+            return letter;
+        }
 
 
         private void TryRevive(Pawn trackedPawn)
@@ -123,11 +183,11 @@ namespace PauseWalker.ModGameComponent
 
         public void Register(Pawn pawn)
         {
-            if (pawn == null || tracked.ContainsKey(pawn.ThingID)) return;
+            if (pawn == null || tracked.ContainsKey(pawn.thingIDNumber)) return;
 
             if (!Utils.HasPauseWalkerAbility(pawn)) return;
 
-            tracked[pawn.ThingID] = pawn;
+            tracked[pawn.thingIDNumber] = pawn;
 
             Log.Message($"[PauseWalkerManager] added pawn：{pawn.LabelCap}");
         }
@@ -135,8 +195,8 @@ namespace PauseWalker.ModGameComponent
 
         public void RegisterThroughAbility(Pawn pawn)
         {
-            if (pawn == null || tracked.ContainsKey(pawn.ThingID)) return;
-            tracked[pawn.ThingID] = pawn;
+            if (pawn == null || tracked.ContainsKey(pawn.thingIDNumber)) return;
+            tracked[pawn.thingIDNumber] = pawn;
             Log.Message($"[PauseWalkerManager] added pawn：{pawn.LabelCap}");
 
         }

@@ -1,4 +1,5 @@
-﻿using RimWorld;
+﻿using PauseWalker.Defs;
+using RimWorld;
 using Verse;
 
 namespace PauseWalker.Hediffs
@@ -24,13 +25,12 @@ namespace PauseWalker.Hediffs
             {
                 yield return new Command_Action
                 {
-                    defaultLabel = "Revive",
-                    defaultDesc = "revive",
+                    defaultLabel = "PauseWalker.ReviveLabel".Translate(),
+                    defaultDesc = "PauseWalker.ReviveDesc".Translate(),
                     icon = PauseWalkerResurrectHediff.Icon.Texture,
                     action = () =>
                     {
                         this.Use();
-                        Messages.Message("PawnRevived".Translate(this.pawn), this.pawn, MessageTypeDefOf.PositiveEvent);
                     }
                 };
             }
@@ -39,7 +39,10 @@ namespace PauseWalker.Hediffs
 
         private void Use()
         {
-            Messages.Message("MessageUsingSelfResurrection".Translate(this.pawn), this.pawn, MessageTypeDefOf.NeutralEvent, true);
+            Messages.Message("PauseWalker.ReviveMessage".Translate(this.pawn), this.pawn, MessageTypeDefOf.PositiveEvent, true);
+
+            PauseWalkerReturnEffecterDefOf.PauseWalker_Return.Spawn().Trigger(pawn, null);
+
             ResurrectionUtility.TryResurrect(this.pawn);
         }
 
@@ -50,7 +53,7 @@ namespace PauseWalker.Hediffs
                 return this.pawn.IsColonist && (this.pawn.HostFaction == null || this.pawn.IsSlave);
             }
         }
-        private static readonly CachedTexture Icon = new CachedTexture("UI/Abilities/SelfResurrect");
+        private static readonly CachedTexture Icon = new CachedTexture("Icon/PauseWalkerReviveIcon");
         public override bool ShouldRemove => false;
 
     }

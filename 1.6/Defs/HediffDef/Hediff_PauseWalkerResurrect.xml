@@ -9,6 +9,6 @@
         <tendable>false</tendable>
         <alwaysShowSeverity>false</alwaysShowSeverity>
         <showGizmosOnCorpse>true</showGizmosOnCorpse>
-        <preventsDeath>true</preventsDeath>
+        <!-- <preventsDeath>true</preventsDeath> -->
     </HediffDef>
 </Defs>
