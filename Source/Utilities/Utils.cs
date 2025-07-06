@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using PauseWalker.Defs;
 using RimWorld;
+using RimWorld.Planet;
 using Verse;
 namespace PauseWalker.Utilities
 {
@@ -86,6 +87,7 @@ namespace PauseWalker.Utilities
             return corpse != null && !corpse.Destroyed && corpse.Spawned && corpse.MapHeld != null;
         }
 
+        // 这个方法只处理WorldPawns, 如果Pawn已经在Map中则不管
         public static void TryRevive(Pawn trackedPawn, IntVec3 loc, Map map)
         {
             if (trackedPawn == null)
@@ -93,8 +95,8 @@ namespace PauseWalker.Utilities
                 Log.Error($"[PauseWalker] Try revive pawn from world failed: trackedPawn is null.");
                 return;
             }
-
-            Pawn? found = Find.WorldPawns.AllPawnsDead.FirstOrDefault(p => p.ThingID == trackedPawn.ThingID);
+            // 只处理WorldPawns
+            Pawn? found = Find.WorldPawns.AllPawnsAliveOrDead.FirstOrDefault(p => p.ThingID == trackedPawn.ThingID);
             if (found != null)
             {
                 if (found.Dead)
@@ -115,6 +117,24 @@ namespace PauseWalker.Utilities
 
             Log.Warning($"[PauseWalker] Try revive {trackedPawn.LabelCap} failed: can not found pawn in WorldPawns.");
             return;
+        }
+
+        public static bool IsAbandonedColonist(Pawn pawn)
+        {
+            if (pawn == null)
+                return false;
+
+            if (!pawn.IsColonist)
+                return false;
+
+            bool isAbandoned = pawn.Faction == Faction.OfPlayer // 玩家派系
+                               && !pawn.Dead
+                               && !pawn.Discarded
+                               && !pawn.Spawned
+                               && pawn.MapHeld == null
+                               && pawn.GetCaravan() == null;
+
+            return isAbandoned;
         }
     }
 }

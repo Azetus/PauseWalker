@@ -119,7 +119,7 @@ namespace PauseWalker.Letter
             );
         }
 
-        public static bool IsValidSpawnCell(IntVec3 cell, Map map)
+        private bool IsValidSpawnCell(IntVec3 cell, Map map)
         {
             return cell.InBounds(map) &&
                    cell.Standable(map) &&
@@ -132,6 +132,29 @@ namespace PauseWalker.Letter
             if (thingIDNumber < 0) return null;
             
             return Find.WorldPawns.AllPawnsAliveOrDead.FirstOrDefault(p => p.thingIDNumber == thingIDNumber);
+        }
+
+
+        public static bool LetterStackExists(Pawn pawn)
+        {
+            return Find.LetterStack.LettersListForReading.Exists(L =>
+            {
+                if (L is ChoiceLetter_PauseWalkerReturn pauseWalkerLetter && pauseWalkerLetter.Pawn == pawn)
+                {
+                    return true;
+                }
+                return false;
+            });
+        }
+
+        public static ChoiceLetter_PauseWalkerReturn MakePauseWalkerLetter(Pawn pawn)
+        {
+            ChoiceLetter_PauseWalkerReturn letter = (ChoiceLetter_PauseWalkerReturn)LetterMaker.MakeLetter(PauseWalkerReturnLetterDefOf.PauseWalkerReturnLetter);
+            letter.Pawn = pawn;
+            letter.Label = "PauseWalker.PauseWalkerReturnLetterName".Translate(pawn);
+            letter.Text = "PauseWalker.PauseWalkerReturnLetterText".Translate(pawn);
+            letter.PawnThingIDNumber = pawn.thingIDNumber;
+            return letter;
         }
 
     }

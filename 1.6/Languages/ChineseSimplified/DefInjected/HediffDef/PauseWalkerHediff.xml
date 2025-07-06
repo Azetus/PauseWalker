@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
     <PauseWalkerHediff.label>时隙穿行</PauseWalkerHediff.label>
-    <PauseWalkerHediff.description>未知的力量在其体内涌动。该个体与时间流暂时分离，在冻结的时间中继续前行。</PauseWalkerHediff.description>
+    <PauseWalkerHediff.description>未知的力量在其体内涌动。该个体与时间流暂时分离，在冻结的时间中继续前行，并逆转其身体上的破损。</PauseWalkerHediff.description>
+    <PauseWalkerResurrectHediff.label>逆时场</PauseWalkerResurrectHediff.label>
+    <PauseWalkerResurrectHediff.description>该个体体内包含的一个小型逆时场，可以在其死后主动激活，能够将身体恢复至死前的状态并重获生命。</PauseWalkerResurrectHediff.description>
 </LanguageData>

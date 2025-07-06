@@ -2,8 +2,8 @@
 <Defs>
     <HediffDef>
         <defName>PauseWalkerResurrectHediff</defName>
-        <label>PauseWalkerResurrectMark</label>
-        <description>Template desc</description>
+        <label>Time Reversal Field</label>
+        <description>A small time reversal field resides within this being. Upon death, it may be manually triggered to restore the body to its prior state and revive the individual.</description>
         <hediffClass>PauseWalker.Hediffs.PauseWalkerResurrectHediff</hediffClass>
         <isBad>false</isBad>
         <tendable>false</tendable>

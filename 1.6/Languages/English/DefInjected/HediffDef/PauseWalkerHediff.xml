@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
     <PauseWalkerHediff.label>Out of Sync</PauseWalkerHediff.label>
-    <PauseWalkerHediff.description>An unknown force surges within their body. This entity is temporarily detached from the flow of time, continuing onward through frozen moments.</PauseWalkerHediff.description>
+    <PauseWalkerHediff.description>An unknown force surges within their body. This entity is temporarily detached from the flow of time, continuing onward through frozen moments, gradually reversing the damage to their body.</PauseWalkerHediff.description>
+    <PauseWalkerResurrectHediff.label>Time Reversal Field</PauseWalkerResurrectHediff.label>
+    <PauseWalkerResurrectHediff.description>A small time reversal field resides within this being. Upon death, it may be manually triggered to restore the body to its prior state and revive the individual.</PauseWalkerResurrectHediff.description>
 </LanguageData>

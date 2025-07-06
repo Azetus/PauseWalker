@@ -1,5 +1,4 @@
 ﻿using PauseWalker.Defs;
-using PauseWalker.Hediffs;
 using PauseWalker.ModGameComponent;
 using RimWorld;
 using RimWorld.Planet;
@@ -36,7 +35,7 @@ namespace PauseWalker.CustomAbility
 
         private void AddResurrectionHediff()
         {
-            if (pawn != null && !pawn.health.hediffSet.HasHediff(PauseWalkerResurrectHediffDefOf.PauseWalkerResurrectHediff))
+            if (pawn != null && pawn.health != null && pawn.health.hediffSet != null && !pawn.health.hediffSet.HasHediff(PauseWalkerResurrectHediffDefOf.PauseWalkerResurrectHediff))
             {
                 pawn.health.AddHediff(PauseWalkerResurrectHediffDefOf.PauseWalkerResurrectHediff);
             }
