@@ -95,7 +95,7 @@
         <graphicData>
             <graphicClass>Graphic_FleckPulse</graphicClass>
             <texPath>Things/Mote/HoraxianGeoCurved</texPath>
-            <shaderType>HoraxianSnake</shaderType>
+            <shaderType>Mote</shaderType>
             <renderInstanced>false</renderInstanced>
             <shaderParameters>
                 <_brightnessMultiplier>0.0</_brightnessMultiplier>
