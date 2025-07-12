@@ -61,16 +61,19 @@ namespace PauseWalker.ModGameComponent
                 if (trackedPawn == null)
                 {
                     toBeRemoved.Add(id);
+                    Log.Message($"[PauseWalker] removing PauseWalker id={id}, reason: trackedPawn is null.");
                     continue;
                 }
                 if (!Utils.HasPauseWalkerAbility(trackedPawn))
                 {
                     toBeRemoved.Add(id);
+                    Log.Message($"[PauseWalker] removing PauseWalker {trackedPawn}, reason: pawn is not PauseWalker.");
                     continue;
                 }
                 if (!trackedPawn.IsColonist)
                 {
                     toBeRemoved.Add(id);
+                    Log.Message($"[PauseWalker] removing PauseWalker {trackedPawn}, reason: pawn is no longer colonist.");
                     continue;
                 }
 
