@@ -76,6 +76,12 @@ namespace PauseWalker.ModGameComponent
                     Log.Message($"[PauseWalker] removing PauseWalker {trackedPawn}, reason: pawn is no longer colonist.");
                     continue;
                 }
+                if(PawnsFinder.All_AliveOrDead.Find(p => p.ThingID == trackedPawn.ThingID) == null)
+                {
+                    toBeRemoved.Add(id);
+                    Log.Message($"[PauseWalker] removing PauseWalker {trackedPawn}, reason: pawn is removed from world.");
+                    continue;
+                }
 
                 if (!trackedPawn.Dead && trackedPawn.IsColonist)
                 {

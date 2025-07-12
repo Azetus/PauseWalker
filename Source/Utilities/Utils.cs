@@ -96,7 +96,7 @@ namespace PauseWalker.Utilities
                 return;
             }
             // 只处理WorldPawns
-            Pawn? found = Find.WorldPawns.AllPawnsAliveOrDead.FirstOrDefault(p => p.ThingID == trackedPawn.ThingID);
+            Pawn? found = Find.WorldPawns.AllPawnsAliveOrDead.Find(p => p.ThingID == trackedPawn.ThingID);
             if (found != null)
             {
                 if (found.Dead)
