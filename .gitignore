@@ -4,6 +4,11 @@
 .vscode/
 **/.vscode/
 
+.idea/
+**/.idea/
+
+*.sln.DotSettings.user
+
 **/bin/*
 **/obj/*
 
