@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using PauseWalker.Utilities;
 using RimWorld;
+using RimWorld.Planet;
 using System.Collections;
 using System.Diagnostics;
 using UnityEngine;
@@ -34,7 +35,7 @@ namespace PauseWalker.Patches
 
             ticksThisFrame = 0;
 
-            if (Current.Game == null || Find.CurrentMap == null || Find.TickManager.CurTimeSpeed != TimeSpeed.Paused)
+            if (Current.Game == null || Find.CurrentMap == null || !WorldRendererUtility.DrawingMap || Find.TickManager.CurTimeSpeed != TimeSpeed.Paused)
                 return;
 
             if (Mathf.Abs(Time.deltaTime - curTimePerTick) < curTimePerTick * 0.1f)

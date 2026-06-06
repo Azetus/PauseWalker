@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using PauseWalker.Utilities;
+using RimWorld.Planet;
 using Verse;
 
 namespace PauseWalker.Patches.TicksGamePatch
@@ -17,7 +18,7 @@ namespace PauseWalker.Patches.TicksGamePatch
 
             try
             {
-                if (Find.TickManager.CurTimeSpeed == TimeSpeed.Paused)
+                if (Find.TickManager.CurTimeSpeed == TimeSpeed.Paused && WorldRendererUtility.DrawingMap)
                 {
                     if (Utils.CurrentMapContainsPauseWalker(Find.CurrentMap))
                     {

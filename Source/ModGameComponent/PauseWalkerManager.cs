@@ -8,13 +8,40 @@ namespace PauseWalker.ModGameComponent
 {
     public class PauseWalkerManager : GameComponent
     {
+        public static PauseWalkerManager Instance { get; private set; }
+
         private Dictionary<int, Pawn> tracked = new Dictionary<int, Pawn>();
-        private int checkInterval = 60;
+        private int checkInterval = 7200;
         private int tickCounter = 0;
 
         public PauseWalkerManager(Game game) : base()
         {
+            Instance = this;
             Log.Message("[PauseWalker] PauseWalkerManager");
+        }
+
+        public bool HasActivePauseWalkerOnMap(Map map)
+        {
+            if (map == null) return false;
+            foreach (var pair in tracked)
+            {
+                var pawn = pair.Value;
+                if (pawn != null && !pawn.Destroyed
+                    && pawn.MapHeld == map
+                    && Utils.HasPauseWalkerHediff(pawn))
+                    return true;
+            }
+            return false;
+        }
+
+        public void ClearAllPauseWalkerHediffs()
+        {
+            foreach (var pair in tracked)
+            {
+                var pawn = pair.Value;
+                if (pawn != null && !pawn.Destroyed)
+                    Utils.RemoveHediffAndAbilityFromPawn(pawn);
+            }
         }
 
         public override void GameComponentTick()
@@ -23,27 +50,6 @@ namespace PauseWalker.ModGameComponent
 
             tickCounter++;
             if (tickCounter % checkInterval != 0) return;
-
-            // 定期检查一下有没有不在 tracked 中的 pawn
-            if (tickCounter % (checkInterval * 10) == 0)
-            {
-                // 需要找所有Pawn, 包括在Map中和World中的
-                List<Pawn> pauseWalkers = PawnsFinder.All_AliveOrDead.FindAll(p =>
-                {
-                    return Utils.HasPauseWalkerAbility(p) && p.IsColonist;
-                });
-                foreach (var item in pauseWalkers)
-                {
-                    if (!tracked.ContainsKey(item.thingIDNumber))
-                    {
-                        Log.Message("[PauseWalker] found unregisted PauseWalker" + item.Name);
-                        this.Register(item);
-                    }
-                }
-
-                tickCounter = 0;
-            }
-
 
             HashSet<int> toBeRemoved = new HashSet<int>();
 
@@ -123,6 +129,7 @@ namespace PauseWalker.ModGameComponent
                 tracked.Remove(id);
             }
 
+            tickCounter = 0;
 
         }
 

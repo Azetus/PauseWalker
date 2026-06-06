@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using PauseWalker.Utilities;
+using RimWorld.Planet;
 using UnityEngine;
 using Verse;
 
@@ -13,7 +14,7 @@ namespace PauseWalker.Patches
         {
             if (Find.TickManager != null && Find.CurrentMap != null)
             {
-                if (Find.TickManager.CurTimeSpeed == TimeSpeed.Paused && Utils.CurrentMapContainsPauseWalker(Find.CurrentMap))
+                if (Find.TickManager.CurTimeSpeed == TimeSpeed.Paused && WorldRendererUtility.DrawingMap && Utils.CurrentMapContainsPauseWalker(Find.CurrentMap))
                 {
                     if (AccessTools.Field(__instance.GetType(), "forceNormalSpeedUntil") is { } forceNormalSpeedUntilField &&
                         forceNormalSpeedUntilField.GetValue(__instance) is int)
@@ -37,7 +38,7 @@ namespace PauseWalker.Patches
 
             if (Find.TickManager != null && Find.CurrentMap != null)
             {
-                if (Find.TickManager.CurTimeSpeed == TimeSpeed.Paused && Utils.CurrentMapContainsPauseWalker(Find.CurrentMap))
+                if (Find.TickManager.CurTimeSpeed == TimeSpeed.Paused && WorldRendererUtility.DrawingMap && Utils.CurrentMapContainsPauseWalker(Find.CurrentMap))
                 {
                     if (AccessTools.Field(__instance.GetType(), "forceNormalSpeedUntil") is { } forceNormalSpeedUntilField &&
                         forceNormalSpeedUntilField.GetValue(__instance) is int forceNormalSpeedUntil)

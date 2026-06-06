@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using PauseWalker.Defs;
+using PauseWalker.ModGameComponent;
 using RimWorld;
 using RimWorld.Planet;
 using Verse;
@@ -44,19 +45,13 @@ namespace PauseWalker.Utilities
 
         public static bool CurrentMapContainsPauseWalker(Map currentMap)
         {
-            if (Current.Game != null && Find.TickManager != null && currentMap != null && currentMap.mapPawns != null)
-            {
-                var spawnedPawns = currentMap.mapPawns.AllPawnsSpawned;
-                if (spawnedPawns.Count > 0)
-                {
-                    return spawnedPawns.Any(pawn =>
-                    {
-                        return IsPauseWalkerPawn(pawn);
-                    });
-                }
-            }
+            if (currentMap == null) return false;
+            var manager = PauseWalkerManager.Instance;
+            if (manager != null)
+                return manager.HasActivePauseWalkerOnMap(currentMap);
 
-            return false;
+            var pawns = currentMap.mapPawns.AllPawnsSpawned;
+            return pawns.Count > 0 && pawns.Any(pawn => IsPauseWalkerPawn(pawn));
         }
 
         public static void RemoveHediffAndAbilityFromPawn(Pawn pawn)
