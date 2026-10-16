@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+    <ThingDef ParentName="BaseBullet">
+        <defName>PauseWalker_Knife_Projectile</defName>
+        <label>throwing knife</label>
+        <graphicData>
+            <texPath>Things/Knife</texPath>
+            <graphicClass>Graphic_Single</graphicClass>
+            <drawSize>(1,1)</drawSize>
+        </graphicData>
+        <projectile>
+            <damageDef>PauseWalkerKnife</damageDef>
+            <damageAmountBase>100</damageAmountBase>
+            <stoppingPower>1.5</stoppingPower>
+            <armorPenetrationBase>10.0</armorPenetrationBase>
+            <speed>30</speed>
+        </projectile>
+    </ThingDef>
+</Defs>

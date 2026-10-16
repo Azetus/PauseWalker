@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+	<PauseWalkerAbility.label>PauseWalker</PauseWalkerAbility.label>
+	<PauseWalkerAbility.description>Pausing the flow of time around them, this entity acts freely while all else halts.</PauseWalkerAbility.description>
+    <DropRoadRollerAbility.label>Road Roller-Da!</DropRoadRollerAbility.label>
+    <DropRoadRollerAbility.description>Drops a road roller from the sky to deliver devastating impact.</DropRoadRollerAbility.description>
+    <PauseWalker_ThrowKnife.label>Throw knife</PauseWalker_ThrowKnife.label>
+    <PauseWalker_ThrowKnife.description>Throw a deadly knife at the target.</PauseWalker_ThrowKnife.description>
+</LanguageData>

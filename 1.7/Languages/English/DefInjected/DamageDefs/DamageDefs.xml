@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+   <RoadRollerExplosion.label>road roller explosion</RoadRollerExplosion.label>
+   <RoadRollerExplosion.deathMessage>{0} has been crushed by a road roller.</RoadRollerExplosion.deathMessage>
+   <PauseWalkerKnife.label>knife pierce</PauseWalkerKnife.label>
+   <PauseWalkerKnife.deathMessage>{0} has been stabbed to death.</PauseWalkerKnife.deathMessage>
+</LanguageData>
