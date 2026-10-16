@@ -16,11 +16,7 @@ namespace PauseWalker.Patches
             {
                 if (Find.TickManager.CurTimeSpeed == TimeSpeed.Paused && WorldRendererUtility.DrawingMap && Utils.CurrentMapContainsPauseWalker(Find.CurrentMap))
                 {
-                    if (AccessTools.Field(__instance.GetType(), "forceNormalSpeedUntil") is { } forceNormalSpeedUntilField &&
-                        forceNormalSpeedUntilField.GetValue(__instance) is int)
-                    {
-                        forceNormalSpeedUntilField.SetValue(__instance, Mathf.Max(Utils.GetRawTicksGameInt() + 800));
-                    }
+                    __instance.forceNormalSpeedUntil = Mathf.Max(Utils.GetRawTicksGameInt() + 800);
 
                 }
             }
@@ -40,11 +36,7 @@ namespace PauseWalker.Patches
             {
                 if (Find.TickManager.CurTimeSpeed == TimeSpeed.Paused && WorldRendererUtility.DrawingMap && Utils.CurrentMapContainsPauseWalker(Find.CurrentMap))
                 {
-                    if (AccessTools.Field(__instance.GetType(), "forceNormalSpeedUntil") is { } forceNormalSpeedUntilField &&
-                        forceNormalSpeedUntilField.GetValue(__instance) is int forceNormalSpeedUntil)
-                    {
-                        forceNormalSpeedUntilField.SetValue(__instance, Mathf.Max(forceNormalSpeedUntil, Utils.GetRawTicksGameInt() + 240));
-                    }
+                    __instance.forceNormalSpeedUntil = Mathf.Max(__instance.forceNormalSpeedUntil, Utils.GetRawTicksGameInt() + 240);
                 }
             }
 

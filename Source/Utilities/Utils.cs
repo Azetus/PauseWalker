@@ -1,5 +1,4 @@
-﻿using HarmonyLib;
-using PauseWalker.Defs;
+﻿using PauseWalker.Defs;
 using PauseWalker.ModGameComponent;
 using RimWorld;
 using RimWorld.Planet;
@@ -12,11 +11,7 @@ namespace PauseWalker.Utilities
         {
             if (Current.Game != null && Find.TickManager != null)
             {
-                if (AccessTools.Field(Find.TickManager.GetType(), "ticksGameInt") is { } rawTicksGameField &&
-                    rawTicksGameField.GetValue(Find.TickManager) is int ticks)
-                {
-                    return ticks;
-                }
+                return Find.TickManager.ticksGameInt;
             }
 
             return 0;

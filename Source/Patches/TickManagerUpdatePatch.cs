@@ -2,7 +2,6 @@
 using PauseWalker.Utilities;
 using RimWorld;
 using RimWorld.Planet;
-using System.Collections;
 using System.Diagnostics;
 using UnityEngine;
 using Verse;
@@ -89,100 +88,98 @@ namespace PauseWalker.Patches
 
         private static void DoTickListNormal()
         {
-            if (AccessTools.Field(Find.TickManager.GetType(), "tickListNormal")?.GetValue(Find.TickManager) is TickList tickListNormal &&
-                AccessTools.Field(tickListNormal.GetType(), "tickType")?.GetValue(tickListNormal) is TickerType tickType &&
-                AccessTools.Field(tickListNormal.GetType(), "thingsToRegister")?.GetValue(tickListNormal) is List<Thing> thingsToRegister &&
-                AccessTools.Field(tickListNormal.GetType(), "thingsToDeregister")?.GetValue(tickListNormal) is List<Thing> thingsToDeregister &&
-                AccessTools.Field(tickListNormal.GetType(), "thingLists")?.GetValue(tickListNormal) is List<List<Thing>> thingLists
-                )
+            var tickListNormal = Find.TickManager.tickListNormal;
+            var tickType = tickListNormal.tickType;
+            var thingsToRegister = tickListNormal.thingsToRegister;
+            var thingsToDeregister = tickListNormal.thingsToDeregister;
+            var thingLists = tickListNormal.thingLists;
+
+            int interval = GetTickInterval(tickType);
+            int index = Find.TickManager.TicksGame % interval;
+            if (index >= 0 && index < thingLists.Count)
             {
-                int interval = GetTickInterval(tickType);
-                int index = Find.TickManager.TicksGame % interval;
-                if (index >= 0 && index < thingLists.Count)
+                List<Thing> list2 = thingLists[index];
+
+                for (int i = 0; i < thingsToRegister.Count; i++)
                 {
-                    List<Thing> list2 = thingLists[index];
-
-                    for (int i = 0; i < thingsToRegister.Count; i++)
+                    BucketOf(thingsToRegister[i], thingLists, tickType).Add(thingsToRegister[i]);
+                }
+                thingsToRegister.Clear();
+                for (int j = 0; j < thingsToDeregister.Count; j++)
+                {
+                    BucketOf(thingsToDeregister[j], thingLists, tickType).Remove(thingsToDeregister[j]);
+                }
+                thingsToDeregister.Clear();
+                for (int m = 0; m < list2.Count; m++)
+                {
+                    var itemToTick = list2[m];
+                    if (!itemToTick.Destroyed)
                     {
-                        BucketOf(thingsToRegister[i], thingLists, tickType).Add(thingsToRegister[i]);
-                    }
-                    thingsToRegister.Clear();
-                    for (int j = 0; j < thingsToDeregister.Count; j++)
-                    {
-                        BucketOf(thingsToDeregister[j], thingLists, tickType).Remove(thingsToDeregister[j]);
-                    }
-                    thingsToDeregister.Clear();
-                    for (int m = 0; m < list2.Count; m++)
-                    {
-                        var itemToTick = list2[m];
-                        if (!itemToTick.Destroyed)
+                        try
                         {
-                            try
+                            switch (itemToTick)
                             {
-                                switch (itemToTick)
-                                {
-                                    case Pawn pawn when Utils.IsPauseWalkerPawn(pawn):
-                                        pawn.DoTick();
-                                        // 更新小人贴图
-                                        CellRect viewRect = Find.CameraDriver.CurrentViewRect.ExpandedBy(3);
-                                        pawn.ProcessPostTickVisuals(ticksThisFrame, viewRect);
-                                        break;
-                                    // 处理投射物
-                                    case Projectile projectile when IsPauseProjectile(projectile):
-                                        projectile.DoTick();
-                                        break;
-                                    case ThingWithComps projectile when IsPauseProjectile(projectile):
-                                        projectile.DoTick();
-                                        break;
-                                    case Explosion explosion when IsPauseExplosion(explosion):
-                                        explosion.DoTick();
-                                        break;
-                                    case IncineratorSpray incincerSpray when IsPauseIncineratorSpray(incincerSpray):
-                                        incincerSpray.DoTick();
-                                        break;
-                                    case Building_Door door when ShouldDoorOpenInPause(door):
-                                        door.DoTick();
-                                        break;
-                                    case Mote mote when IsPauseWalkerMote(mote):
-                                        mote.DoTick();
-                                        break;
-                                    case Skyfaller sf when IsRoadRoller(sf):
-                                        sf.DoTick();
-                                        break;
-                                    case Thing thing when IsThingAfterPause(thing):
-                                        thing.DoTick();
-                                        break;
-                                }
+                                case Pawn pawn when Utils.IsPauseWalkerPawn(pawn):
+                                    pawn.DoTick();
+                                    // 更新小人贴图
+                                    CellRect viewRect = Find.CameraDriver.CurrentViewRect.ExpandedBy(3);
+                                    pawn.ProcessPostTickVisuals(ticksThisFrame, viewRect);
+                                    break;
+                                // 处理投射物
+                                case Projectile projectile when IsPauseProjectile(projectile):
+                                    projectile.DoTick();
+                                    break;
+                                case ThingWithComps projectile when IsPauseProjectile(projectile):
+                                    projectile.DoTick();
+                                    break;
+                                case Explosion explosion when IsPauseExplosion(explosion):
+                                    explosion.DoTick();
+                                    break;
+                                case IncineratorSpray incincerSpray when IsPauseIncineratorSpray(incincerSpray):
+                                    incincerSpray.DoTick();
+                                    break;
+                                case Building_Door door when ShouldDoorOpenInPause(door):
+                                    door.DoTick();
+                                    break;
+                                case Mote mote when IsPauseWalkerMote(mote):
+                                    mote.DoTick();
+                                    break;
+                                case Skyfaller sf when IsRoadRoller(sf):
+                                    sf.DoTick();
+                                    break;
+                                case Thing thing when IsThingAfterPause(thing):
+                                    thing.DoTick();
+                                    break;
                             }
-                            catch (Exception ex)
-                            {
-                                string text = itemToTick.Spawned ? (" (at " + itemToTick.Position + ")") : "";
-                                if (Prefs.DevMode)
-                                {
-                                    Log.Error(string.Concat(new object[]
-                                    {
-                                "[Pause Walker] Exception ticking ",
-                                itemToTick.ToStringSafe<Thing>(),
-                                text,
-                                ": ",
-                                ex
-                                    }));
-                                }
-                                else
-                                {
-                                    Log.ErrorOnce(string.Concat(new object[]
-                                    {
-                                "[Pause Walker] Exception ticking ",
-                                itemToTick.ToStringSafe<Thing>(),
-                                text,
-                                ". Suppressing further errors. Exception: ",
-                                ex
-                                    }), itemToTick.thingIDNumber ^ 576876901);
-                                }
-                            }
-
-
                         }
+                        catch (Exception ex)
+                        {
+                            string text = itemToTick.Spawned ? (" (at " + itemToTick.Position + ")") : "";
+                            if (Prefs.DevMode)
+                            {
+                                Log.Error(string.Concat(new object[]
+                                {
+                            "[Pause Walker] Exception ticking ",
+                            itemToTick.ToStringSafe<Thing>(),
+                            text,
+                            ": ",
+                            ex
+                                }));
+                            }
+                            else
+                            {
+                                Log.ErrorOnce(string.Concat(new object[]
+                                {
+                            "[Pause Walker] Exception ticking ",
+                            itemToTick.ToStringSafe<Thing>(),
+                            text,
+                            ". Suppressing further errors. Exception: ",
+                            ex
+                                }), itemToTick.thingIDNumber ^ 576876901);
+                            }
+                        }
+
+
                     }
                 }
             }
@@ -295,12 +292,7 @@ namespace PauseWalker.Patches
         private static bool ShouldDoorOpenInPause(Building_Door door)
         {
             if (door == null) return false;
-            if(AccessTools.Field(door.GetType(), "lastFriendlyTouchTick") is { } lastFriendlyTouchTickField &&
-                lastFriendlyTouchTickField.GetValue(door) is int lastFriendlyTouchTick)
-            {
-                return lastFriendlyTouchTick > Utils.GetRawTicksGameInt();
-            }
-            return false;
+            return door.lastFriendlyTouchTick > Utils.GetRawTicksGameInt();
         }
 
         // 处理枪口火光
@@ -308,41 +300,13 @@ namespace PauseWalker.Patches
         {
             if (currentMap == null)
                 return;
-            if (currentMap.flecks is { } curMapFlecksManager &&
-                AccessTools.Field(curMapFlecksManager.GetType(), "systems") is { } fleckSysField &&
-                fleckSysField.GetValue(curMapFlecksManager) is Dictionary<Type, FleckSystem> fleckSystemDic
-                )
+            if (currentMap.flecks is { } curMapFlecksManager)
             {
                 var currentRawTick = Utils.GetRawTicksGameInt();
-                var targetSys = fleckSystemDic.Values.Where(fleckSystem =>
-                {
-                    if (AccessTools.Field(fleckSystem.GetType(), "dataGametime") is { } dataGameTimeField &&
-                        dataGameTimeField.GetValue(fleckSystem) is IList dataGameTime
-                    )
-                    {
-
-                        foreach (var item in dataGameTime)
-                        {
-                            if (AccessTools.Field(item.GetType(), "setupTick") is { } setupTickField &&
-                                setupTickField.GetValue(item) is int setupTick
-                            )
-                            {
-                                if (setupTick > currentRawTick)
-                                    return true;
-                            }
-                            if (AccessTools.Field(item.GetType(), "baseData") is { } baseDataField &&
-                               baseDataField.GetValue(item) is FleckStatic baseData)
-                            {
-                                if (baseData.setupTick > currentRawTick)
-                                    return true;
-                            }
-                        }
-
-                    }
-
-                    return false;
-                }).ToList();
-
+                // Select systems before ticking, since Tick() can modify Fleck state.
+                var targetSys = curMapFlecksManager.Systems
+                    .Where(system => HasFleckAfterPause(system, currentRawTick))
+                    .ToList();
 
                 foreach (var item in targetSys)
                 {
@@ -350,6 +314,37 @@ namespace PauseWalker.Patches
                         item.Tick();
                 }
             }
+        }
+
+        private static bool HasFleckAfterPause(FleckSystem system, int currentRawTick)
+        {
+            // Match generic bases so subclasses using the same Fleck data are supported too.
+            switch (system)
+            {
+                case FleckSystemBase<FleckStatic> staticSystem:
+                    foreach (var fleck in staticSystem.dataGametime)
+                    {
+                        if (fleck.setupTick > currentRawTick)
+                            return true;
+                    }
+                    break;
+                case FleckSystemBase<FleckThrown> thrownSystem:
+                    foreach (var fleck in thrownSystem.dataGametime)
+                    {
+                        if (fleck.baseData.setupTick > currentRawTick)
+                            return true;
+                    }
+                    break;
+                case FleckSystemBase<FleckSplash> splashSystem:
+                    foreach (var fleck in splashSystem.dataGametime)
+                    {
+                        if (fleck.setupTick > currentRawTick)
+                            return true;
+                    }
+                    break;
+            }
+
+            return false;
         }
 
     }

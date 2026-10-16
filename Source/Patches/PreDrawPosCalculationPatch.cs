@@ -2,7 +2,6 @@
 using PauseWalker.Utilities;
 using System.Reflection;
 using System.Reflection.Emit;
-using UnityEngine;
 using Verse;
 
 namespace PauseWalker.Patches
@@ -56,90 +55,6 @@ namespace PauseWalker.Patches
             foreach (var code in codes)
                 yield return code;
 
-        }
-
-
-
-        //public static bool Prefix(PawnTweener __instance)
-        //{
-        //    return PatchPrefixWithReflect(__instance);
-        //}
-
-        /**
-         * 用prefix修改 PreDrawPosCalculation，基本逻辑和 PreDrawPosCalculation 没有区别
-         * 在pawn满足特定条件的时候 float tickRateMultiplier = 1f
-         * 
-         * NOTE: 现在不需要用prefix修改了
-         */
-        private static bool PatchPrefixWithReflect(PawnTweener __instance)
-        {
-            if (Current.Game == null || Find.CurrentMap == null)
-                return true;
-            if (Find.TickManager.CurTimeSpeed == TimeSpeed.Paused)
-            {
-                var pawnVal = AccessTools.Field(typeof(PawnTweener), "pawn").GetValue(__instance);
-                if (pawnVal is Pawn pawn)
-                {
-                    if (Utils.IsPauseWalkerPawn(pawn))
-                    {
-                        var lastDrawFrameField = AccessTools.Field(typeof(PawnTweener), "lastDrawFrame");
-                        var lastDrawTickField = AccessTools.Field(typeof(PawnTweener), "lastDrawTick");
-                        var tweenedPosField = AccessTools.Field(typeof(PawnTweener), "tweenedPos");
-                        var lastTickSpringPosField = AccessTools.Field(typeof(PawnTweener), "lastTickSpringPos");
-
-                        var TweenedPosRootMethod = AccessTools.Method(typeof(PawnTweener), "TweenedPosRoot");
-
-
-                        int lastDrawFrame = (int)lastDrawFrameField.GetValue(__instance);
-                        int lastDrawTick = (int)lastDrawTickField.GetValue(__instance);
-
-                        if (lastDrawFrame == RealTime.frameCount)
-                        {
-                            return true;
-                        }
-                        if (!pawn.Spawned)
-                        {
-                            tweenedPosField.SetValue(__instance, pawn.Position.ToVector3Shifted());
-                            return false;
-                        }
-                        if (lastDrawFrame < RealTime.frameCount - 1 && lastDrawTick < GenTicks.TicksGame - 1)
-                        {
-                            __instance.ResetTweenedPosToRoot();
-                        }
-                        else
-                        {
-                            lastTickSpringPosField.SetValue(__instance, tweenedPosField.GetValue(__instance));
-                            float tickRateMultiplier = 1f;
-                            if (tickRateMultiplier < 5f)
-                            {
-                                var tweenedPosRootMethod = AccessTools.Method(typeof(PawnTweener), "TweenedPosRoot");
-                                Vector3 tweenedPosRoot = (Vector3)tweenedPosRootMethod.Invoke(__instance, null);
-                                Vector3 tweenedPos = (Vector3)tweenedPosField.GetValue(__instance);
-
-                                Vector3 a = tweenedPosRoot - tweenedPos;
-                                float num = 0.09f * (RealTime.deltaTime * 60f * tickRateMultiplier);
-                                if (RealTime.deltaTime > 0.05f)
-                                {
-                                    num = Mathf.Min(num, 1f);
-                                }
-                                tweenedPosField.SetValue(__instance, tweenedPos + a * num);
-
-                            }
-                            else
-                            {
-                                __instance.ResetTweenedPosToRoot();
-                            }
-                        }
-                        lastDrawFrameField.SetValue(__instance, RealTime.frameCount);
-                        lastDrawTickField.SetValue(__instance, GenTicks.TicksGame);
-
-
-                        return false;
-                    }
-                }
-            }
-
-            return true;
         }
     }
 }

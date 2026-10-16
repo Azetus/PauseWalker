@@ -17,12 +17,8 @@ namespace PauseWalker.Patches
                 {
                     if (dinfo.Def.harmsHealth)
                     {
-                        if (AccessTools.Field(__instance.GetType(), "lastDamageTick") is { } lastDamageTickField &&
-                            lastDamageTickField.GetValue(__instance) is int)
-                        {
-                            lastDamageTickField.SetValue(__instance, Utils.GetRawTicksGameInt());
-                            return false;
-                        }
+                        __instance.lastDamageTick = Utils.GetRawTicksGameInt();
+                        return false;
                     }
                 }
 

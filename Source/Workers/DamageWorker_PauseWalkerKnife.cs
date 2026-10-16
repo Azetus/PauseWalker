@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using Verse;
+﻿using Verse;
 
 namespace PauseWalker.Workers
 {
@@ -7,12 +6,7 @@ namespace PauseWalker.Workers
     {
         public override DamageResult Apply(DamageInfo dinfo, Thing victim)
         {
-            FieldInfo field = typeof(DamageInfo).GetField("ignoreArmorInt", BindingFlags.NonPublic | BindingFlags.Instance);
-
-            if (field != null)
-            {
-                field.SetValueDirect(__makeref(dinfo), true);
-            }
+            dinfo.SetIgnoreArmor(true);
             return base.Apply(dinfo, victim);
 
         }
