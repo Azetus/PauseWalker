@@ -80,13 +80,13 @@ namespace PauseWalker.Patches
             TickPathFinder(currentMap);
             // 参考原本 DoSingleTick 的逻辑，在这里要增加 TicksGameInt，推进游戏时间流逝，不过这里增加的是模拟时间
             SimulatedTickManager.IncreaseSimTick();
-            DoTickListNormal();
+            DoTickListNormal(currentMap);
             // MapPostTick
             TickPausedFlecks(currentMap);
 
         }
 
-        private static void DoTickListNormal()
+        private static void DoTickListNormal(Map currentMap)
         {
             var tickListNormal = Find.TickManager.tickListNormal;
             var tickType = tickListNormal.tickType;
@@ -113,7 +113,8 @@ namespace PauseWalker.Patches
                 for (int m = 0; m < list2.Count; m++)
                 {
                     var itemToTick = list2[m];
-                    if (!itemToTick.Destroyed)
+                    // 注册/注销维护全局列表；实际 Tick 仅推进当前地图，与寻路和 Fleck 范围一致。
+                    if (!itemToTick.Destroyed && itemToTick.Map == currentMap)
                     {
                         try
                         {
