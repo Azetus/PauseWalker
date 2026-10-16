@@ -121,9 +121,9 @@ namespace PauseWalker.Patches
                             {
                                 case Pawn pawn when Utils.IsPauseWalkerPawn(pawn):
                                     pawn.DoTick();
-                                    // 更新小人贴图
+                                    // 更新小人贴图，每次 Pawn Tick 后推进 1 Tick 的视觉状态；帧内累计次数仅用于控制外层循环。
                                     CellRect viewRect = Find.CameraDriver.CurrentViewRect.ExpandedBy(3);
-                                    pawn.ProcessPostTickVisuals(ticksThisFrame, viewRect);
+                                    pawn.ProcessPostTickVisuals(1, viewRect);
                                     break;
                                 // 处理投射物
                                 case Projectile projectile when IsPauseProjectile(projectile):
