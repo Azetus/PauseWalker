@@ -49,9 +49,9 @@ namespace PauseWalker.Utilities
             return pawns.Count > 0 && pawns.Any(pawn => IsPauseWalkerPawn(pawn));
         }
 
-        public static void RemoveHediffAndAbilityFromPawn(Pawn pawn)
+        public static void RemovePauseWalkerHediff(Pawn pawn)
         {
-            // 移除小人身上的PauseWalker相关状态与技能
+            // 子技能由 Hediff 提供，随 Hediff 一起退出有效能力列表。
             if (pawn == null) return;
 
             if (pawn.health?.hediffSet != null)
@@ -62,12 +62,6 @@ namespace PauseWalker.Utilities
                     pawn.health.RemoveHediff(existing);
                 }
             }
-            if (HasPauseWalkerAbility(pawn))
-            {
-                pawn.abilities.RemoveAbility(DropRoadRollerAbilityDefOf.DropRoadRollerAbility);
-                pawn.abilities.RemoveAbility(PauseWalker_ThrowKnifeAbilityDefOf.PauseWalker_ThrowKnife);
-            }
-
         }
 
 

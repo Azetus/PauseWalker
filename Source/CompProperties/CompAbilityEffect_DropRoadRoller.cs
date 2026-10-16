@@ -17,7 +17,7 @@ namespace PauseWalker.CompProperties
         public override void Apply(LocalTargetInfo target, LocalTargetInfo dest)
         {
             Pawn pawn = parent.pawn;
-            if (!Utils.IsPauseWalkerPawn(pawn))
+            if (!Utils.IsPauseWalkerPawn(pawn) || Find.TickManager?.CurTimeSpeed != TimeSpeed.Paused)
             {
                 return;
             }
@@ -31,26 +31,5 @@ namespace PauseWalker.CompProperties
             SkyfallerMaker.SpawnSkyfaller(roadrollerDef, position, map);
         }
 
-        public override bool GizmoDisabled(out string reason)
-        {
-            Pawn pawn = parent.pawn;
-            if (!Utils.IsPauseWalkerPawn(pawn)) {
-                List<string> reasons = new List<string>();
-                if (!Utils.HasPauseWalkerAbility(pawn)){
-                    var notPauseWalker = "PauseWalker.NotPauseWalker".Translate();
-                    reasons.Add(notPauseWalker);
-                }
-
-                if (!Utils.HasPauseWalkerHediff(pawn)){
-                    var noPauseWalkerHediff = "PauseWalker.NoPauseWalkerHediff".Translate();
-                    reasons.Add(noPauseWalkerHediff);
-                }
-                reason = string.Join("\n", reasons);
-                return true;
-            }
-
-            reason = String.Empty;
-            return false;
-        }
     }
 }

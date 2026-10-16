@@ -1,5 +1,4 @@
-﻿using PauseWalker.Defs;
-using PauseWalker.Utilities;
+﻿using PauseWalker.Utilities;
 using RimWorld;
 using Verse;
 
@@ -26,7 +25,6 @@ namespace PauseWalker.CompProperties
                 return;
             ToggleEffecter(pawn, target);
             ToggleHediffState(pawn, pauseWalkerHediffDef);
-            GainNewAbility(pawn);
         }
 
         private void ToggleHediffState(Pawn pawn, HediffDef pauseWalkerHediffDef)
@@ -43,36 +41,6 @@ namespace PauseWalker.CompProperties
                 pawn.health.AddHediff(HediffMaker.MakeHediff(pauseWalkerHediffDef, pawn));
                 if (Find.TickManager.CurTimeSpeed != TimeSpeed.Paused)
                     Find.TickManager.TogglePaused();
-            }
-        }
-
-        private void GainNewAbility(Pawn pawn)
-        {
-            Pawn_AbilityTracker? pawnAbilityTracker = pawn.abilities;
-            if (pawnAbilityTracker == null) return;
-
-            bool hasHediff = Utils.HasPauseWalkerHediff(pawn);
-            bool hasRoadRollerAbility = pawnAbilityTracker.GetAbility(DropRoadRollerAbilityDefOf.DropRoadRollerAbility) != null;
-            bool hasThrowKnifeAbility = pawnAbilityTracker.GetAbility(PauseWalker_ThrowKnifeAbilityDefOf.PauseWalker_ThrowKnife) != null;
-
-
-            if (!hasRoadRollerAbility && hasHediff)
-            {
-                pawnAbilityTracker.GainAbility(DropRoadRollerAbilityDefOf.DropRoadRollerAbility);
-            }
-            if (hasRoadRollerAbility && !hasHediff)
-            {
-                pawnAbilityTracker.RemoveAbility(DropRoadRollerAbilityDefOf.DropRoadRollerAbility);
-            }
-
-
-            if (!hasThrowKnifeAbility && hasHediff)
-            {
-                pawnAbilityTracker.GainAbility(PauseWalker_ThrowKnifeAbilityDefOf.PauseWalker_ThrowKnife);
-            }
-            if (hasThrowKnifeAbility && !hasHediff)
-            {
-                pawnAbilityTracker.RemoveAbility(PauseWalker_ThrowKnifeAbilityDefOf.PauseWalker_ThrowKnife);
             }
         }
 

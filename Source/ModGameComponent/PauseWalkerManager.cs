@@ -40,7 +40,7 @@ namespace PauseWalker.ModGameComponent
             {
                 var pawn = pair.Value;
                 if (pawn != null && !pawn.Destroyed)
-                    Utils.RemoveHediffAndAbilityFromPawn(pawn);
+                    Utils.RemovePauseWalkerHediff(pawn);
             }
         }
 

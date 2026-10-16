@@ -4,9 +4,13 @@
 		<defName>PauseWalkerHediff</defName>
 		<label>Out of Sync</label>
 		<description>An unknown force surges within their body. This entity is temporarily detached from the flow of time, continuing onward through frozen moments.</description>
-		<hediffClass>HediffWithComps</hediffClass>
+		<hediffClass>PauseWalker.Hediffs.PauseWalkerHediff</hediffClass>
 		<isBad>false</isBad>
 		<tendable>false</tendable>
+		<abilities>
+			<li>DropRoadRollerAbility</li>
+			<li>PauseWalker_ThrowKnife</li>
+		</abilities>
 		<comps>
 			<li Class="HediffCompProperties_DisappearsOnDeath" />
 			<li Class="PauseWalker.CompProperties.PauseWalkerHediffCompProperties_Regenerate">

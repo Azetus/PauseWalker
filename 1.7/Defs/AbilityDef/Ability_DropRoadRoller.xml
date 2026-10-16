@@ -2,6 +2,7 @@
 <Defs>
 	<AbilityDef>
 		<defName>DropRoadRollerAbility</defName>
+		<abilityClass>PauseWalker.CustomAbility.PauseWalkerSubAbility</abilityClass>
 		<label>Road Roller-Da!</label>
 		<description>Drops a road roller from the sky to deliver devastating impact.</description>
 		<cooldownTicksRange>420</cooldownTicksRange>

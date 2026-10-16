@@ -2,6 +2,7 @@
 <Defs>
     <AbilityDef>
         <defName>PauseWalker_ThrowKnife</defName>
+        <abilityClass>PauseWalker.CustomAbility.PauseWalkerSubAbility</abilityClass>
         <label>throw knife</label>
         <description>Throw a deadly knife at the target.</description>
         <cooldownTicksRange>60</cooldownTicksRange>
