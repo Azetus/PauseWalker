@@ -296,56 +296,75 @@ namespace PauseWalker.Patches
             return door.lastFriendlyTouchTick > Utils.GetRawTicksGameInt();
         }
 
-        // 处理枪口火光
-        private static void TickPausedFlecks(Map currentMap)
+        // 只推进符合时间戳条件的游戏时间粒子；现实时间粒子仍由原版 Update() 处理。
+        private static void TickPausedFlecks(Map? currentMap)
         {
-            if (currentMap == null)
+            if (Current.Game == null || Find.TickManager == null || currentMap?.flecks is not { } manager ||
+                manager.parent != currentMap || manager.systems == null)
                 return;
-            if (currentMap.flecks is { } curMapFlecksManager)
-            {
-                var currentRawTick = Utils.GetRawTicksGameInt();
-                // Select systems before ticking, since Tick() can modify Fleck state.
-                var targetSys = curMapFlecksManager.Systems
-                    .Where(system => HasFleckAfterPause(system, currentRawTick))
-                    .ToList();
 
-                foreach (var item in targetSys)
+            var systems = manager.Systems?.ToList();
+            if (systems == null) return;
+            int currentRawTick = Utils.GetRawTicksGameInt();
+
+            // 先取得系统快照，TimeInterval 的附带行为即使改变系统集合，也不影响本次枚举。
+            foreach (var system in systems)
+            {
+                if (system == null) continue;
+                try
                 {
-                    if (item != null)
-                        item.Tick();
+                    // 仅接管准确的原版类型，避免绕过自定义子类覆写的 Tick()。
+                    switch (system)
+                    {
+                        case FleckSystemStatic staticSystem when system.GetType() == typeof(FleckSystemStatic):
+                            TickSelectedFlecks(staticSystem, currentMap, currentRawTick, static fleck => fleck.setupTick);
+                            break;
+                        case FleckSystemThrown thrownSystem when system.GetType() == typeof(FleckSystemThrown):
+                            TickSelectedFlecks(thrownSystem, currentMap, currentRawTick, static fleck => fleck.baseData.setupTick);
+                            break;
+                        case FleckSystemSplash splashSystem when system.GetType() == typeof(FleckSystemSplash):
+                            TickSelectedFlecks(splashSystem, currentMap, currentRawTick, static fleck => fleck.setupTick);
+                            break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // 单个系统失败不阻断其他系统；每种系统只记录一次，避免每帧刷屏。
+                    Log.ErrorOnce($"[PauseWalker] Exception ticking paused Fleck system {system.GetType().FullName}: {ex}",
+                        system.GetType().GetHashCode() ^ 0x51F1EC);
                 }
             }
         }
 
-        private static bool HasFleckAfterPause(FleckSystem system, int currentRawTick)
+        private static void TickSelectedFlecks<TFleck>(FleckSystemBase<TFleck>? system, Map? currentMap,
+            int currentRawTick, Func<TFleck, int>? getSetupTick) where TFleck : struct, IFleck
         {
-            // Match generic bases so subclasses using the same Fleck data are supported too.
-            switch (system)
-            {
-                case FleckSystemBase<FleckStatic> staticSystem:
-                    foreach (var fleck in staticSystem.dataGametime)
-                    {
-                        if (fleck.setupTick > currentRawTick)
-                            return true;
-                    }
-                    break;
-                case FleckSystemBase<FleckThrown> thrownSystem:
-                    foreach (var fleck in thrownSystem.dataGametime)
-                    {
-                        if (fleck.baseData.setupTick > currentRawTick)
-                            return true;
-                    }
-                    break;
-                case FleckSystemBase<FleckSplash> splashSystem:
-                    foreach (var fleck in splashSystem.dataGametime)
-                    {
-                        if (fleck.setupTick > currentRawTick)
-                            return true;
-                    }
-                    break;
-            }
+            if (system == null || currentMap == null || getSetupTick == null || system.parent?.parent != currentMap)
+                return;
+            var particles = system.dataGametime;
+            var removeIndices = system.tmpRemoveIndices;
+            if (particles == null || removeIndices == null) return;
 
-            return false;
+            // 沿用原版 Tick 的倒序更新、结构体写回和批量移除，仅额外筛选生成时间。
+            try
+            {
+                for (int i = particles.Count - 1; i >= 0; i--)
+                {
+                    TFleck fleck = particles[i];
+                    // 保留现有时间戳规则；跨次时停的模拟时间误判仍按 R2 接受。
+                    if (getSetupTick(fleck) <= currentRawTick) continue;
+                    if (fleck.TimeInterval(1f / 60f, currentMap))
+                        removeIndices.Add(i);
+                    else
+                        particles[i] = fleck;
+                }
+                particles.RemoveBatchUnordered(removeIndices);
+            }
+            finally
+            {
+                // 即使原版粒子更新抛出异常，也不把旧索引留给后续 Tick 或 Update。
+                removeIndices.Clear();
+            }
         }
 
     }
