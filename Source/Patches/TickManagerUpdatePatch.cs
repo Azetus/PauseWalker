@@ -17,6 +17,7 @@ namespace PauseWalker.Patches
     public static class TickManagerUpdatePatch
     {
 
+        // 帧时间累积量（秒），与 SimulatedTickManager 保存的模拟整数 Tick 分开管理。
         static float realTimeToTickThrough;
         static int ticksThisFrame;
         const float curTimePerTick = 1f / 60f; // 1 秒对应 60 次 Tick（假设是 1 倍速）
@@ -34,8 +35,12 @@ namespace PauseWalker.Patches
 
             ticksThisFrame = 0;
 
-            if (Current.Game == null || Find.CurrentMap == null || !WorldRendererUtility.DrawingMap || Find.TickManager.CurTimeSpeed != TimeSpeed.Paused)
+            // 没有活跃时停 Pawn 时不进入计时循环，也不保留上一段模拟的帧时间余量。
+            if (!CanSimulatePausedTicks())
+            {
+                realTimeToTickThrough = 0f;
                 return;
+            }
 
             if (Mathf.Abs(Time.deltaTime - curTimePerTick) < curTimePerTick * 0.1f)
             {
@@ -55,6 +60,13 @@ namespace PauseWalker.Patches
 
                 realTimeToTickThrough -= curTimePerTick;
                 ticksThisFrame++;
+                // Tick 内的回调可能恢复时间、切换视角或移除最后一个时停标记。
+                if (!CanSimulatePausedTicks())
+                {
+                    // 仅丢弃帧时间余量；保留模拟整数 Tick，返回地图后从原值继续推进。
+                    realTimeToTickThrough = 0f;
+                    break;
+                }
                 if (clock.ElapsedMilliseconds > 45.454544f)
                 {
                     break;
@@ -66,6 +78,16 @@ namespace PauseWalker.Patches
             {
                 realTimeToTickThrough = 0f;
             }
+        }
+
+        private static bool CanSimulatePausedTicks()
+        {
+            if (Current.Game == null || Find.TickManager == null ||
+                Find.TickManager.CurTimeSpeed != TimeSpeed.Paused || !WorldRendererUtility.DrawingMap)
+                return false;
+
+            var currentMap = Find.CurrentMap;
+            return currentMap != null && Utils.CurrentMapContainsPauseWalker(currentMap);
         }
 
         // 绕开游戏的 TickManagerUpdate，单独执行一些 DoSingleTick() 内的内容
