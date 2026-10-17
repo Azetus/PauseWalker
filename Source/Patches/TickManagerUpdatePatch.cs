@@ -120,7 +120,10 @@ namespace PauseWalker.Patches
                         {
                             switch (itemToTick)
                             {
-                                case Pawn pawn when Utils.IsPauseWalkerPawn(pawn):
+                                // Pawn 在此结束判断，不依赖通用 Thing 兜底再次排除普通角色。
+                                case Pawn pawn:
+                                    if (!Utils.IsPauseWalkerPawn(pawn))
+                                        break;
                                     pawn.DoTick();
                                     // 更新小人贴图，每次 Pawn Tick 后推进 1 Tick 的视觉状态；帧内累计次数仅用于控制外层循环。
                                     CellRect viewRect = Find.CameraDriver.CurrentViewRect.ExpandedBy(3);
@@ -135,20 +138,26 @@ namespace PauseWalker.Patches
                                     if (IsPauseProjectile(projectile))
                                         projectile.DoTick();
                                     break;
-                                case Explosion explosion when IsPauseExplosion(explosion):
-                                    explosion.DoTick();
+                                // 爆炸必须通过来源判定，不能由生成时间兜底放行。
+                                case Explosion explosion:
+                                    if (IsPauseExplosion(explosion))
+                                        explosion.DoTick();
                                     break;
                                 case IncineratorSpray incincerSpray when IsPauseIncineratorSpray(incincerSpray):
                                     incincerSpray.DoTick();
                                     break;
-                                case Building_Door door when ShouldDoorOpenInPause(door):
-                                    door.DoTick();
+                                // 新建的门也必须满足触碰条件，不能仅凭生成时间获得 Tick。
+                                case Building_Door door:
+                                    if (ShouldDoorOpenInPause(door))
+                                        door.DoTick();
                                     break;
                                 case Mote mote when IsPauseWalkerMote(mote):
                                     mote.DoTick();
                                     break;
-                                case Skyfaller sf when IsRoadRoller(sf):
-                                    sf.DoTick();
+                                // 仅允许本 mod 的压路机，其他新生成的下落物也保持冻结。
+                                case Skyfaller sf:
+                                    if (IsRoadRoller(sf))
+                                        sf.DoTick();
                                     break;
                                 case Thing thing when IsThingAfterPause(thing):
                                     thing.DoTick();
@@ -267,9 +276,13 @@ namespace PauseWalker.Patches
 
         private static bool IsPauseExplosion(Explosion explosion)
         {
-            if (explosion != null && explosion.instigator is Pawn launcherPawn)
+            if (explosion == null)
+                return false;
+            if (explosion.instigator is Pawn launcherPawn)
                 return Utils.IsPauseWalkerPawn(launcherPawn);
-            return false;
+            // 原版 Skyfaller.Impact 以空来源创建压路机爆炸，仅为本 mod 的伤害类型保留例外。
+            return explosion.damType?.defName == "RoadRollerExplosion" &&
+                explosion.spawnedTick > Utils.GetRawTicksGameInt();
         }
 
         private static bool IsPauseIncineratorSpray(IncineratorSpray spray)
@@ -287,7 +300,8 @@ namespace PauseWalker.Patches
 
         private static bool IsRoadRoller(Skyfaller sf)
         {
-            return sf.Spawned && sf.Map != null && sf.def.defName.Contains("RoadRollerIncoming") && sf.spawnedTick >= Utils.GetRawTicksGameInt();
+            return sf != null && sf.Spawned && sf.Map != null && sf.def?.defName == "RoadRollerIncoming" &&
+                sf.spawnedTick >= Utils.GetRawTicksGameInt();
         }
 
         private static bool IsThingAfterPause(Thing thing)
