@@ -1,10 +1,51 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
-    <PauseWalker.NotPauseWalker>只有时停者能够使用这个能力.</PauseWalker.NotPauseWalker>
-    <PauseWalker.NoPauseWalkerHediff>该能力只能在静止的时间中使用.</PauseWalker.NoPauseWalkerHediff>
-    <PauseWalker.PauseWalkerReturnLetterName>{0} 的回归</PauseWalker.PauseWalkerReturnLetterName>
-    <PauseWalker.PauseWalkerReturnLetterText>{0} 的躯体似乎被完全摧毁了, {0} 可以逆转时间重构自己的身体并重新加入你的殖民地, 不过需要你指引身体重构的地点.</PauseWalker.PauseWalkerReturnLetterText>
-    <PauseWalker.ReviveLabel>逆时场</PauseWalker.ReviveLabel>
-    <PauseWalker.ReviveDesc>激活一个逆时场覆盖尸体, 能够将身体恢复至死前的状态.</PauseWalker.ReviveDesc>
-    <PauseWalker.ReviveMessage>{0} 已经复活.</PauseWalker.ReviveMessage>
+  <PauseWalker.NotPauseWalker>只有时停者能够使用这个能力.</PauseWalker.NotPauseWalker>
+  <PauseWalker.NoPauseWalkerHediff>该能力只能在静止的时间中使用.</PauseWalker.NoPauseWalkerHediff>
+  <PauseWalker.PauseWalkerReturnLetterName>{0} 的回归</PauseWalker.PauseWalkerReturnLetterName>
+  <PauseWalker.PauseWalkerReturnLetterText>{0} 可以逆转时间重返殖民地。请选择回归地点；如果已经死亡，将先尝试复活。正常任务、运输和转场期间不能执行回归。</PauseWalker.PauseWalkerReturnLetterText>
+  <PauseWalker.ReviveLabel>逆时场</PauseWalker.ReviveLabel>
+  <PauseWalker.ReviveDesc>激活一个逆时场覆盖尸体, 能够将身体恢复至死前的状态.</PauseWalker.ReviveDesc>
+  <PauseWalker.ReviveMessage>{0} 已经复活.</PauseWalker.ReviveMessage>
+  <PauseWalker.Return.InvalidCell>请选择现存地图上可站立且已探索的格子。</PauseWalker.Return.InvalidCell>
+  <PauseWalker.Return.InvalidPawn>小人的引用或关键数据无效，无法安全回归。</PauseWalker.Return.InvalidPawn>
+  <PauseWalker.Return.ResurrectionFailed>原版复活失败，已停止后续生成。</PauseWalker.Return.ResurrectionFailed>
+  <PauseWalker.Return.DetachFailed>未能从原容器移除小人。</PauseWalker.Return.DetachFailed>
+  <PauseWalker.Return.SpawnFailed>未能确认小人已成功生成。</PauseWalker.Return.SpawnFailed>
+  <PauseWalker.Return.Exception>执行发生异常，请检查日志及小人的当前状态。</PauseWalker.Return.Exception>
+  <PauseWalker.Return.Protected>小人仍处于任务、转场或原版复活流程中，请先结束该流程。</PauseWalker.Return.Protected>
+  <PauseWalker.Return.Failed>回归／复活未完成：{0}</PauseWalker.Return.Failed>
+  <PauseWalker.Return.Success>{0} 已回归／复活。</PauseWalker.Return.Success>
+  <PauseWalker.Debug.Manager>PauseWalker Manager 管理</PauseWalker.Debug.Manager>
+  <PauseWalker.Debug.Search>查找未管理的技能持有者（仅本次扫描）</PauseWalker.Debug.Search>
+  <PauseWalker.Debug.Disable>停用自动管理（保存到存档）</PauseWalker.Debug.Disable>
+  <PauseWalker.Debug.Restore>解除排除并尝试恢复管理</PauseWalker.Debug.Restore>
+  <PauseWalker.Debug.Return>强制回归／复活到选定位置</PauseWalker.Debug.Return>
+  <PauseWalker.Debug.Reclaim>恢复为玩家并强制回归／复活</PauseWalker.Debug.Reclaim>
+  <PauseWalker.State.Missing>对象不存在</PauseWalker.State.Missing>
+  <PauseWalker.State.ManualDisabled>已手动停用管理</PauseWalker.State.ManualDisabled>
+  <PauseWalker.State.Departed>已正式离队</PauseWalker.State.Departed>
+  <PauseWalker.State.NoAbility>已失去主技能</PauseWalker.State.NoAbility>
+  <PauseWalker.State.NotColonist>不属于玩家殖民者</PauseWalker.State.NotColonist>
+  <PauseWalker.State.Discarded>已被丢弃，无法安全恢复</PauseWalker.State.Discarded>
+  <PauseWalker.State.Invalid>关键数据不完整</PauseWalker.State.Invalid>
+  <PauseWalker.State.QuestGuest>临时任务角色</PauseWalker.State.QuestGuest>
+  <PauseWalker.State.Gravship>重力船转场中</PauseWalker.State.Gravship>
+  <PauseWalker.State.AnomalyReturn>等待原版异常事件送回</PauseWalker.State.AnomalyReturn>
+  <PauseWalker.State.Borrowed>任务借用中</PauseWalker.State.Borrowed>
+  <PauseWalker.State.QuestReserved>任务保留或生成中</PauseWalker.State.QuestReserved>
+  <PauseWalker.State.Teleporting>传送中</PauseWalker.State.Teleporting>
+  <PauseWalker.State.Caravan>远行队成员</PauseWalker.State.Caravan>
+  <PauseWalker.State.Transport>运输中或残留运输容器</PauseWalker.State.Transport>
+  <PauseWalker.State.ForSale>结算点待售角色</PauseWalker.State.ForSale>
+  <PauseWalker.State.Resurrecting>原版复活正在执行</PauseWalker.State.Resurrecting>
+  <PauseWalker.State.CorpsePresent>尸体仍存在</PauseWalker.State.CorpsePresent>
+  <PauseWalker.State.OnMap>已经位于地图</PauseWalker.State.OnMap>
+  <PauseWalker.State.Held>仍有容器归属，需人工检查</PauseWalker.State.Held>
+  <PauseWalker.State.Unmanaged>未被 Manager 管理</PauseWalker.State.Unmanaged>
+  <PauseWalker.State.Dead>死亡且尸体不存在，可复活回归</PauseWalker.State.Dead>
+  <PauseWalker.State.Destroyed>已销毁但未死亡，可尝试回归</PauseWalker.State.Destroyed>
+  <PauseWalker.State.Kidnapped>被绑架，可回归</PauseWalker.State.Kidnapped>
+  <PauseWalker.State.Lost>存活失联，可回归</PauseWalker.State.Lost>
+  <PauseWalker.State.Unresolved>位置或状态不明确，需人工检查</PauseWalker.State.Unresolved>
 </LanguageData>

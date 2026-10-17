@@ -1,4 +1,6 @@
-﻿using PauseWalker.Defs;
+using PauseWalker.Defs;
+using PauseWalker.Utilities;
+using PauseWalker.ModGameComponent;
 using RimWorld;
 using Verse;
 
@@ -21,7 +23,9 @@ namespace PauseWalker.Hediffs
                 yield return gizmo;
             }
 
-            if (this.pawn.Dead && this.PlayerControlled)
+            if (this.pawn.Dead && this.PlayerControlled &&
+                Current.Game?.GetComponent<PauseWalkerManager>()?.IsTracked(pawn) == true && PauseWalkerStateUtility.Evaluate(pawn,
+                Current.Game?.GetComponent<PauseWalkerManager>()) == PauseWalkerState.CorpsePresent)
             {
                 yield return new Command_Action
                 {
@@ -39,13 +43,9 @@ namespace PauseWalker.Hediffs
 
         private void Use()
         {
-            Messages.Message("PauseWalker.ReviveMessage".Translate(this.pawn), this.pawn, MessageTypeDefOf.PositiveEvent, true);
-
-            PauseWalkerReturnEffecterDefOf.PauseWalker_Return.Spawn().Trigger(pawn, null);
-
-            ResurrectionUtility.TryResurrect(this.pawn);
+            var result = PauseWalkerReturnUtility.TryResurrectCorpse(pawn);
+            PauseWalkerReturnUtility.ShowResult(pawn, result);
         }
-
         public bool PlayerControlled
         {
             get

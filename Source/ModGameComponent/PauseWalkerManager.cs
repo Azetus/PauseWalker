@@ -1,4 +1,4 @@
-﻿using PauseWalker.Defs;
+using PauseWalker.Defs;
 using PauseWalker.Letter;
 using PauseWalker.Utilities;
 using RimWorld;
@@ -6,205 +6,119 @@ using Verse;
 
 namespace PauseWalker.ModGameComponent
 {
+    public enum ManagementExclusion { None, Manual, Departed }
+
     public class PauseWalkerManager : GameComponent
     {
-        public static PauseWalkerManager Instance { get; private set; }
+        public static PauseWalkerManager? Instance { get; private set; }
+        private readonly Dictionary<int, Pawn> tracked = new();
+        // 仅保留本次会话遇到的引用供调试使用；不深度保存或强制保留 WorldPawn。
+        private readonly Dictionary<int, Pawn> known = new();
+        private Dictionary<int, ManagementExclusion> exclusions = new();
+        private const int CheckInterval = 7200;
+        private int tickCounter;
 
-        private Dictionary<int, Pawn> tracked = new Dictionary<int, Pawn>();
-        private int checkInterval = 7200;
-        private int tickCounter = 0;
+        public PauseWalkerManager(Game game) { Instance = this; }
 
-        public PauseWalkerManager(Game game) : base()
+        public override void ExposeData()
         {
-            Instance = this;
-            Log.Message("[PauseWalker] PauseWalkerManager");
+            base.ExposeData();
+            Scribe_Collections.Look(ref exclusions, "pauseWalkerManagementExclusions", LookMode.Value, LookMode.Value);
+            exclusions ??= new();
+        }
+
+        public override void FinalizeInit()
+        {
+            base.FinalizeInit();
+            // 构造回调可能早于排除名单和能力列表载入，在完整载入后统一校验。
+            foreach (Pawn pawn in tracked.Values.ToList())
+                if (PauseWalkerStateUtility.Evaluate(pawn, this).ShouldUnregister()) Unregister(pawn);
+        }
+
+        public bool IsTracked(Pawn pawn) => tracked.TryGetValue(pawn.thingIDNumber, out Pawn? value) && value == pawn;
+        public ManagementExclusion GetExclusion(Pawn pawn) => exclusions.TryGetValue(pawn.thingIDNumber, out var value)
+            ? value : ManagementExclusion.None;
+        public List<Pawn> KnownPawns() => known.Values.Where(p => p != null).ToList();
+
+        public void RegisterThroughAbility(Pawn pawn)
+        {
+            if (pawn == null) return;
+            known[pawn.thingIDNumber] = pawn;
+            // 构造中的能力尚未加入 Pawn 列表，不能在这里用 GetAbility 再验证。
+            if (GetExclusion(pawn) == ManagementExclusion.None &&
+                (Scribe.mode != LoadSaveMode.Inactive || (pawn.IsColonist && !pawn.IsQuestLodger())))
+                tracked[pawn.thingIDNumber] = pawn;
+        }
+
+        public void NotifyMembershipChanged(Pawn pawn, bool recruited)
+        {
+            if (!known.ContainsKey(pawn.thingIDNumber) && !Utils.HasPauseWalkerAbility(pawn)) return;
+            known[pawn.thingIDNumber] = pawn;
+            if (!pawn.IsColonist || !Utils.HasPauseWalkerAbility(pawn) || pawn.IsQuestLodger())
+            {
+                Unregister(pawn);
+                return;
+            }
+            // 明确重新加入的存活角色可撤销正式离队，手动停用始终保留。
+            if (recruited && !pawn.Dead && !pawn.Destroyed && GetExclusion(pawn) == ManagementExclusion.Departed)
+                exclusions.Remove(pawn.thingIDNumber);
+            if (GetExclusion(pawn) == ManagementExclusion.None) tracked[pawn.thingIDNumber] = pawn;
+        }
+
+        public void Exclude(Pawn pawn, ManagementExclusion reason)
+        {
+            known[pawn.thingIDNumber] = pawn;
+            // 正式离队不能覆盖玩家已经做出的手动停用决定。
+            if (GetExclusion(pawn) != ManagementExclusion.Manual) exclusions[pawn.thingIDNumber] = reason;
+            Unregister(pawn);
+        }
+
+        public void RestoreManagement(Pawn pawn)
+        {
+            exclusions.Remove(pawn.thingIDNumber);
+            NotifyMembershipChanged(pawn, recruited: false);
+        }
+
+        public void Unregister(Pawn pawn)
+        {
+            tracked.Remove(pawn.thingIDNumber);
+            ChoiceLetter_PauseWalkerReturn.CancelFor(pawn);
+            if (!pawn.Destroyed) Utils.RemovePauseWalkerHediff(pawn);
         }
 
         public bool HasActivePauseWalkerOnMap(Map map)
         {
             if (map == null) return false;
-            foreach (var pair in tracked)
-            {
-                var pawn = pair.Value;
-                if (pawn != null && !pawn.Destroyed
-                    && pawn.MapHeld == map
-                    && Utils.HasPauseWalkerHediff(pawn))
-                    return true;
-            }
+            foreach (Pawn pawn in tracked.Values)
+                if (pawn != null && !pawn.Destroyed && pawn.MapHeld == map && Utils.HasPauseWalkerHediff(pawn)) return true;
             return false;
         }
 
         public void ClearAllPauseWalkerHediffs()
         {
-            foreach (var pair in tracked)
-            {
-                var pawn = pair.Value;
-                if (pawn != null && !pawn.Destroyed)
-                    Utils.RemovePauseWalkerHediff(pawn);
-            }
+            foreach (Pawn pawn in tracked.Values.ToList())
+                if (pawn != null && !pawn.Destroyed) Utils.RemovePauseWalkerHediff(pawn);
         }
 
         public override void GameComponentTick()
         {
-            base.GameComponentTick();
-
-            tickCounter++;
-            if (tickCounter % checkInterval != 0) return;
-
-            HashSet<int> toBeRemoved = new HashSet<int>();
-
-            // 检测是否有需要复活的 pawn
-            foreach (var pair in tracked.ToList())
-            {
-                var id = pair.Key;
-                var trackedPawn = pair.Value;
-
-                //Log.Message("[PauseWalker] Current PauseWalker id: " + id + " Name: " + trackedPawn.Name);
-                //Log.Message("[PauseWalker] Current PauseWalker id: " + id + " Dead: " + trackedPawn.Dead + " Destroyed: " + trackedPawn.Destroyed + " Discarded: " + trackedPawn.Discarded);
-                //Pawn? found = Find.WorldPawns.AllPawnsAliveOrDead.FirstOrDefault(p => p.ThingID == trackedPawn.ThingID);
-                //Log.Message($"[PauseWalker] Current PauseWalker in worldPawns: {found}");
-
-                if (trackedPawn == null)
-                {
-                    toBeRemoved.Add(id);
-                    Log.Message($"[PauseWalker] removing PauseWalker id={id}, reason: trackedPawn is null.");
-                    continue;
-                }
-                if (!Utils.HasPauseWalkerAbility(trackedPawn))
-                {
-                    toBeRemoved.Add(id);
-                    Log.Message($"[PauseWalker] removing PauseWalker {trackedPawn}, reason: pawn is not PauseWalker.");
-                    continue;
-                }
-                if (!trackedPawn.IsColonist)
-                {
-                    toBeRemoved.Add(id);
-                    Log.Message($"[PauseWalker] removing PauseWalker {trackedPawn}, reason: pawn is no longer colonist.");
-                    continue;
-                }
-                if(PawnsFinder.All_AliveOrDead.Find(p => p.ThingID == trackedPawn.ThingID) == null)
-                {
-                    toBeRemoved.Add(id);
-                    Log.Message($"[PauseWalker] removing PauseWalker {trackedPawn}, reason: pawn is removed from world.");
-                    continue;
-                }
-
-                if (!trackedPawn.Dead && trackedPawn.IsColonist)
-                {
-                    if (trackedPawn.health != null && trackedPawn.health.hediffSet != null && !trackedPawn.health.hediffSet.HasHediff(PauseWalkerResurrectHediffDefOf.PauseWalkerResurrectHediff))
-                    {
-                        trackedPawn.health.AddHediff(PauseWalkerResurrectHediffDefOf.PauseWalkerResurrectHediff);
-                    }
-                }
-
-                if (!trackedPawn.Dead && trackedPawn.MapHeld != null) continue;
-                //if(!trackedPawn.Dead && trackedPawn.IsFreeColonist) continue;
-
-                if (trackedPawn.Dead && !Utils.HasUsableCorpse(trackedPawn))
-                {
-                    TryReviveThroughLetter(trackedPawn);
-                }
-
-                if (trackedPawn.Destroyed && !Utils.HasUsableCorpse(trackedPawn))
-                {
-                    TryReviveDestroyedThroughLetter(trackedPawn);
-                }
-
-                //if (trackedPawn.Discarded && !Utils.HasUsableCorpse(trackedPawn))
-                //{
-                //    Messages.Message(trackedPawn.Name + " is discarded but revived", trackedPawn, MessageTypeDefOf.PositiveEvent);
-                //    trackedPawn.ForceSetStateToUnspawned();
-                //    TryReviveThroughLetter(trackedPawn);
-                //}
-
-                if (!trackedPawn.Dead && KidnapUtility.IsKidnapped(trackedPawn))
-                {
-                    KidnapPawnReturn(trackedPawn);
-                }
-
-            }
-
-            foreach (var id in toBeRemoved)
-            {
-                tracked.Remove(id);
-            }
-
+            if (++tickCounter < CheckInterval) return;
             tickCounter = 0;
-
-        }
-
-
-        private void TryReviveThroughLetter(Pawn pawn)
-        {
-            if (!ChoiceLetter_PauseWalkerReturn.LetterStackExists(pawn))
+            foreach (Pawn pawn in tracked.Values.ToList())
             {
-                Log.Message($"[PauseWalker] Try revive pawn through letter: {pawn}");
-                ChoiceLetter_PauseWalkerReturn letter = ChoiceLetter_PauseWalkerReturn.MakePauseWalkerLetter(pawn);
-                Find.LetterStack.ReceiveLetter(letter, null, 0, true);
-            }
-        }
-
-        private void TryReviveDestroyedThroughLetter(Pawn pawn)
-        {
-            if (!ChoiceLetter_PauseWalkerReturn.LetterStackExists(pawn))
-            {
-                Log.Message($"[PauseWalker] Try revive destroyed pawn through letter: {pawn}");
-                ChoiceLetter_PauseWalkerReturn letter = ChoiceLetter_PauseWalkerReturn.MakePauseWalkerLetter(pawn);
-                Find.LetterStack.ReceiveLetter(letter, null, 0, true);
-            }
-        }
-
-
-        private void Register(Pawn pawn)
-        {
-            if (pawn == null || tracked.ContainsKey(pawn.thingIDNumber)) return;
-
-            if (!Utils.HasPauseWalkerAbility(pawn)) return;
-
-            tracked[pawn.thingIDNumber] = pawn;
-
-            Log.Message($"[PauseWalkerManager] added pawn：{pawn.LabelCap}");
-        }
-
-
-        public void RegisterThroughAbility(Pawn pawn)
-        {
-            if (pawn == null || tracked.ContainsKey(pawn.thingIDNumber)) return;
-            tracked[pawn.thingIDNumber] = pawn;
-            Log.Message($"[PauseWalkerManager] added pawn：{pawn.LabelCap}");
-
-        }
-
-
-        private void KidnapPawnReturn(Pawn pawn)
-        {
-            List<Faction> allFactionsListForReading = Find.FactionManager.AllFactionsListForReading;
-            foreach (var item in allFactionsListForReading)
-            {
-                if (item.kidnapped.KidnappedPawnsListForReading.Contains(pawn))
+                PauseWalkerState state = PauseWalkerStateUtility.Evaluate(pawn, this);
+                if (state.ShouldUnregister()) { Unregister(pawn); continue; }
+                if (!pawn.Dead && !pawn.Destroyed && !pawn.Discarded && pawn.health?.hediffSet != null &&
+                    !pawn.health.hediffSet.HasHediff(PauseWalkerResurrectHediffDefOf.PauseWalkerResurrectHediff))
+                    pawn.health.AddHediff(PauseWalkerResurrectHediffDefOf.PauseWalkerResurrectHediff);
+                if (state.CanReturn())
                 {
-                    item.kidnapped.RemoveKidnappedPawn(pawn);
-                    RecallKidnappedPawnToMap(pawn);
+                    if (!ChoiceLetter_PauseWalkerReturn.LetterStackExists(pawn))
+                        Find.LetterStack.ReceiveLetter(ChoiceLetter_PauseWalkerReturn.MakePauseWalkerLetter(pawn), null, 0, true);
                 }
+                else if (state is PauseWalkerState.OnMap or PauseWalkerState.CorpsePresent)
+                    ChoiceLetter_PauseWalkerReturn.CancelFor(pawn);
             }
         }
-
-        private void RecallKidnappedPawnToMap(Pawn pawn)
-        {
-            if (pawn.Spawned)
-                return;
-
-            // 设置为玩家派系
-            if (pawn.Faction != Faction.OfPlayer)
-            {
-                pawn.SetFaction(Faction.OfPlayer);
-            }
-
-            Log.Message($"[PauseWalker] recall kidnapped pawn: {pawn}");
-
-            TryReviveThroughLetter(pawn);
-        }
-
-
     }
 }

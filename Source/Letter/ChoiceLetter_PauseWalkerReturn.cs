@@ -1,4 +1,5 @@
-﻿using PauseWalker.Defs;
+using PauseWalker.Defs;
+using PauseWalker.ModGameComponent;
 using PauseWalker.Utilities;
 using RimWorld;
 using Verse;
@@ -7,156 +8,79 @@ namespace PauseWalker.Letter
 {
     public class ChoiceLetter_PauseWalkerReturn : ChoiceLetter
     {
-        private Pawn pawn;
-        private int pawnThingIDNumber = -1;
-
-        public ChoiceLetter_PauseWalkerReturn() : base()
-        {
-
-        }
-
-        public Pawn Pawn
-        {
-            get
-            {
-                return this.pawn;
-            }
-            set
-            {
-                this.pawn = value;
-            }
-        }
-
-        public int PawnThingIDNumber
-        {
-            get
-            {
-                return this.pawnThingIDNumber;
-            }
-            set
-            {
-                this.pawnThingIDNumber = value;
-            }
-        }
+        private Pawn? pawn;
+        public Pawn? Pawn { get => pawn; set => pawn = value; }
+        public override bool CanDismissWithRightClick => false;
 
         public override void ExposeData()
         {
             base.ExposeData();
-            Scribe_Values.Look(ref pawnThingIDNumber, "pawnThingIDNumber");
-            if (Scribe.mode == LoadSaveMode.PostLoadInit)
-            {
-                pawn = FindPawnByThingIDNumber(pawnThingIDNumber);
-            }
+            // 保存引用而非深度保存 Pawn；找不到数据时不凭 ThingID 创建角色。
+            Scribe_References.Look(ref pawn, "pawn", saveDestroyedThings: true);
         }
 
-
-        public override bool CanDismissWithRightClick
-        {
-            get
-            {
-                return false;
-            }
-        }
+        private PauseWalkerState CurrentState => PauseWalkerStateUtility.Evaluate(pawn,
+            Current.Game?.GetComponent<PauseWalkerManager>());
 
         public override IEnumerable<DiaOption> Choices
         {
             get
             {
-                if (base.ArchivedOnly || pawn == null || this.pawn.Spawned)
+                PauseWalkerState state = CurrentState;
+                if (ArchivedOnly || state.ShouldUnregister() || state is PauseWalkerState.OnMap or PauseWalkerState.CorpsePresent)
                 {
-                    yield return base.Option_Close;
+                    yield return Option_Close;
+                    yield break;
                 }
-                else
-                {
-                    yield return Accept;
-                    yield return Postpone;
-                }
-
-                yield break;
+                DiaOption accept = new("Accept".Translate()) { resolveTree = true, action = BeginSelection };
+                if (!state.CanReturn()) accept.Disable(state.Description());
+                yield return accept;
+                yield return new DiaOption("PostponeLetter".Translate()) { resolveTree = true };
             }
         }
 
-        protected DiaOption Postpone
+        private void BeginSelection()
         {
-            get
+            // 点击接受时再次校验，不能把发信时的快照当成长期有效的许可。
+            PauseWalkerState state = CurrentState;
+            if (!state.CanReturn())
             {
-                DiaOption diaOption = new DiaOption("PostponeLetter".Translate());
-                diaOption.resolveTree = true;
-                return diaOption;
+                if (pawn != null) PauseWalkerReturnUtility.ShowResult(pawn, ReturnResult.Blocked(state));
+                return;
             }
-        }
-
-        protected DiaOption Accept
-        {
-            get
+            Map? map = Current.Game?.CurrentMap;
+            if (map == null)
             {
-                return new DiaOption("Accept".Translate())
-                {
-                    action = () =>
-                    {
-                        if (Current.Game.CurrentMap != null)
-                        {
-                            BeginCellSelectionInMap(Current.Game.CurrentMap);
-                        }
-                    },
-                    resolveTree = true
-                };
+                Messages.Message("PauseWalker.Return.InvalidCell".Translate(), MessageTypeDefOf.RejectInput, false);
+                return;
             }
-        }
-        private void BeginCellSelectionInMap(Map map)
-        {
-            Find.Targeter.BeginTargeting(
-                TargetingParameters.ForCell(),
-                (LocalTargetInfo target) =>
-                {
-                    if (target.IsValid && IsValidSpawnCell(target.Cell, map))
-                    {
-                        PauseWalkerReturnEffecterDefOf.PauseWalker_Return.Spawn().Trigger(target.ToTargetInfo(map), null);
-                        Utils.TryRevive(this.pawn, target.Cell, map);
-                        Find.LetterStack.RemoveLetter(this);
-                    }
-                }
-            );
-        }
-
-        private bool IsValidSpawnCell(IntVec3 cell, Map map)
-        {
-            return cell.InBounds(map) &&
-                   cell.Standable(map) &&
-                   !cell.Fogged(map);
-        }
-
-
-        private Pawn? FindPawnByThingIDNumber(int thingIDNumber)
-        {
-            if (thingIDNumber < 0) return null;
-            
-            return Find.WorldPawns.AllPawnsAliveOrDead.FirstOrDefault(p => p.thingIDNumber == thingIDNumber);
-        }
-
-
-        public static bool LetterStackExists(Pawn pawn)
-        {
-            return Find.LetterStack.LettersListForReading.Exists(L =>
+            Find.Targeter.BeginTargeting(TargetingParameters.ForCell(), target =>
             {
-                if (L is ChoiceLetter_PauseWalkerReturn pauseWalkerLetter && pauseWalkerLetter.Pawn == pawn)
-                {
-                    return true;
-                }
-                return false;
+                if (!target.IsValid || pawn == null) return;
+                // 选点期间状态和地图都可能变化，由执行器进行最终校验。
+                ReturnResult result = PauseWalkerReturnUtility.TryReturn(pawn, target.Cell, map);
+                PauseWalkerReturnUtility.ShowResult(pawn, result);
             });
+        }
+
+        public static bool LetterStackExists(Pawn pawn) => Find.LetterStack.LettersListForReading
+            .OfType<ChoiceLetter_PauseWalkerReturn>().Any(letter => letter.pawn == pawn);
+
+        public static void CancelFor(Pawn pawn)
+        {
+            if (Current.Game == null || Find.LetterStack == null) return;
+            foreach (var letter in Find.LetterStack.LettersListForReading.OfType<ChoiceLetter_PauseWalkerReturn>()
+                .Where(letter => letter.pawn == pawn).ToList())
+                Find.LetterStack.RemoveLetter(letter);
         }
 
         public static ChoiceLetter_PauseWalkerReturn MakePauseWalkerLetter(Pawn pawn)
         {
-            ChoiceLetter_PauseWalkerReturn letter = (ChoiceLetter_PauseWalkerReturn)LetterMaker.MakeLetter(PauseWalkerReturnLetterDefOf.PauseWalkerReturnLetter);
-            letter.Pawn = pawn;
-            letter.Label = "PauseWalker.PauseWalkerReturnLetterName".Translate(pawn);
-            letter.Text = "PauseWalker.PauseWalkerReturnLetterText".Translate(pawn);
-            letter.PawnThingIDNumber = pawn.thingIDNumber;
+            var letter = (ChoiceLetter_PauseWalkerReturn)LetterMaker.MakeLetter(PauseWalkerReturnLetterDefOf.PauseWalkerReturnLetter);
+            letter.pawn = pawn;
+            letter.Label = "PauseWalker.PauseWalkerReturnLetterName".Translate(pawn.LabelShortCap);
+            letter.Text = "PauseWalker.PauseWalkerReturnLetterText".Translate(pawn.LabelShortCap);
             return letter;
         }
-
     }
-
 }

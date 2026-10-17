@@ -1,4 +1,4 @@
-﻿using PauseWalker.Defs;
+using PauseWalker.Defs;
 using PauseWalker.ModGameComponent;
 using RimWorld;
 using RimWorld.Planet;
@@ -65,60 +65,7 @@ namespace PauseWalker.Utilities
         }
 
 
-        public static bool HasUsableCorpse(Pawn pawn)
-        {
-            Corpse corpse = pawn.Corpse;
-            return corpse != null && !corpse.Destroyed && corpse.Spawned && corpse.MapHeld != null;
-        }
-
-        // 这个方法只处理WorldPawns, 如果Pawn已经在Map中则不管
-        public static void TryRevive(Pawn trackedPawn, IntVec3 loc, Map map)
-        {
-            if (trackedPawn == null)
-            {
-                Log.Error($"[PauseWalker] Try revive pawn from world failed: trackedPawn is null.");
-                return;
-            }
-            // 只处理WorldPawns
-            Pawn? found = Find.WorldPawns.AllPawnsAliveOrDead.Find(p => p.ThingID == trackedPawn.ThingID);
-            if (found != null)
-            {
-                if (found.Dead)
-                {
-                    bool success = ResurrectionUtility.TryResurrect(found);
-                    if (!success) {
-                        Log.Warning($"[PauseWalker] Resurrection failed for {found}.");
-                    }
-                }
-                if (found.Destroyed || found.Discarded)
-                {
-                    found.ForceSetStateToUnspawned();
-                }
-                GenSpawn.Spawn(found, loc, map);
-                Log.Message($"[PauseWalker] Try revive from world: {found}");
-                return;
-            }
-
-            Log.Warning($"[PauseWalker] Try revive {trackedPawn.LabelCap} failed: can not found pawn in WorldPawns.");
-            return;
-        }
-
-        public static bool IsAbandonedColonist(Pawn pawn)
-        {
-            if (pawn == null)
-                return false;
-
-            if (!pawn.IsColonist)
-                return false;
-
-            bool isAbandoned = pawn.Faction == Faction.OfPlayer // 玩家派系
-                               && !pawn.Dead
-                               && !pawn.Discarded
-                               && !pawn.Spawned
-                               && pawn.MapHeld == null
-                               && pawn.GetCaravan() == null;
-
-            return isAbandoned;
-        }
+        // 墓穴、容器、搬运及运输中的尸体仍存在，自动回归不能将其当作丢失。
+        public static bool HasUsableCorpse(Pawn pawn) => pawn.Corpse != null && !pawn.Corpse.Destroyed;
     }
 }
