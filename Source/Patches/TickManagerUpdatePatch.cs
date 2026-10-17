@@ -126,12 +126,14 @@ namespace PauseWalker.Patches
                                     CellRect viewRect = Find.CameraDriver.CurrentViewRect.ExpandedBy(3);
                                     pawn.ProcessPostTickVisuals(1, viewRect);
                                     break;
-                                // 处理投射物
-                                case Projectile projectile when IsPauseProjectile(projectile):
-                                    projectile.DoTick();
+                                // 射弹在专用分支结束判断，避免非时停角色的射弹落入生成时间兜底。
+                                case Projectile projectile:
+                                    if (IsPauseProjectile(projectile))
+                                        projectile.DoTick();
                                     break;
-                                case ThingWithComps projectile when IsPauseProjectile(projectile):
-                                    projectile.DoTick();
+                                case ThingWithComps projectile when IsCombatExtendedProjectile(projectile):
+                                    if (IsPauseProjectile(projectile))
+                                        projectile.DoTick();
                                     break;
                                 case Explosion explosion when IsPauseExplosion(explosion):
                                     explosion.DoTick();
@@ -234,7 +236,18 @@ namespace PauseWalker.Patches
                 return false;
             if (projectile.Launcher is Pawn launcherPawn)
             {
-                Utils.IsPauseWalkerPawn(launcherPawn);
+                return Utils.IsPauseWalkerPawn(launcherPawn);
+            }
+            return false;
+        }
+
+        private static bool IsCombatExtendedProjectile(ThingWithComps? thing)
+        {
+            // CE 为可选依赖，按继承链识别其射弹；普通 ThingWithComps 仍交给后续分支。
+            for (Type? type = thing?.GetType(); type != null; type = type.BaseType)
+            {
+                if (type.FullName == "CombatExtended.ProjectileCE")
+                    return true;
             }
             return false;
         }
@@ -243,12 +256,11 @@ namespace PauseWalker.Patches
         {
             if (thing == null)
                 return false;
-            //处理CE模组的 ProjectileCE
+            // 仅在 switch 已识别为 CE 射弹后访问 launcher，不依赖 CE 程序集。
             if (AccessTools.Field(thing.GetType(), "launcher") is { } launcherField &&
                         launcherField.GetValue(thing) is Pawn launcherPawn)
             {
                 return Utils.IsPauseWalkerPawn(launcherPawn);
-
             }
             return false;
         }
